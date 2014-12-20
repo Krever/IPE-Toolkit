@@ -1,0 +1,23 @@
+# Created by .gitignore support plugin (hsz.mobi)
+### SBT template
+
+target/
+lib_managed/
+project/boot/
+.cache
+
+### Scala template
+*.log
+
+# sbt specific
+.cache/
+.lib/
+dist/*
+project/plugins/project/
+
+## Intellij project
+.idea/
+/*.iml
+
+
+
