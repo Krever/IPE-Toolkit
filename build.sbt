@@ -16,8 +16,9 @@ lazy val javafxBackend = project
   .dependsOn(core)
 
 
-libraryDependencies ++= Seq(
-  "org.specs2" %% "specs2-core" % "2.4.15" % "test"
+libraryDependencies in ThisBuild ++= Seq(
+  "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
+  ,"org.mockito" % "mockito-core" % "1.10.19"
 )
 
 scalacOptions in Test ++= Seq("-Yrangepos")
