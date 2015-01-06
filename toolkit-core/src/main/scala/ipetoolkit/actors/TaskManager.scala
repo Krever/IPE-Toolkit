@@ -1,10 +1,10 @@
-package pl.codekratisti.actors
+package ipetoolkit.actors
 
 import akka.actor.Actor
 import akka.event.Logging
-import pl.codekratisti.bus.CentralEventBus
-import pl.codekratisti.messages._
-import pl.codekratisti.model.Task
+import ipetoolkit.bus.CentralEventBus
+import ipetoolkit.messages._
+import ipetoolkit.model.Task
 
 import scala.collection.mutable
 

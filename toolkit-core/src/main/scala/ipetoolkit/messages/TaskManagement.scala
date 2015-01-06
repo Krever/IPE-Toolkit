@@ -1,6 +1,6 @@
-package pl.codekratisti.messages
+package ipetoolkit.messages
 
-import pl.codekratisti.model.Task
+import ipetoolkit.model.Task
 
 sealed trait TaskManagement extends Message
 

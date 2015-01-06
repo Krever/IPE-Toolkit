@@ -1,13 +1,13 @@
-package pl.codekratisti.actors
+package ipetoolkit.actors
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import pl.codekratisti.bus.CentralEventBus
-import pl.codekratisti.messages._
-import pl.codekratisti.model.Task
+import ipetoolkit.bus.CentralEventBus
+import ipetoolkit.messages._
+import ipetoolkit.model.Task
 
 
 class TaskManagerSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender

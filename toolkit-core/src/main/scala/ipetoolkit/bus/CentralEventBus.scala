@@ -1,9 +1,9 @@
-package pl.codekratisti.bus
+package ipetoolkit.bus
 
 import akka.actor.ActorRef
 import akka.event.{SubchannelClassification, EventBus}
 import akka.util.Subclassification
-import pl.codekratisti.messages.Message
+import ipetoolkit.messages.Message
 
 /**
  * Event bus used across the system

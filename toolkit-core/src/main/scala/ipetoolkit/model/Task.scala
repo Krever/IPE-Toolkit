@@ -1,4 +1,4 @@
-package pl.codekratisti.model
+package ipetoolkit.model
 
 /**
  * Base class for long running tasks.
