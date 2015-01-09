@@ -17,35 +17,35 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
   val busMock = mock[CentralEventBus]
 
-  class TestTaskManager extends TaskManager(busMock) {
-    override def taskUpdated(task: Task): Unit = super.taskUpdated(task)
+  class TestTaskManager extends TaskManager()(busMock) {
+    override def onTaskProgressUpdated(uid:String, progress:Double): Unit = super.onTaskProgressUpdated(uid, progress)
+    override def onTaskCancelled(uid: String): Unit = super.onTaskCancelled(uid)
+    override def onTaskCreated(task: Task): Unit = super.onTaskCreated(task)
+    override def onTaskFinished(uid: String): Unit = super.onTaskFinished(uid)
 
-    override def taskRemoved(uid: String): Unit = super.taskRemoved(uid)
-
-    override def taskAdded(task: Task): Unit = super.taskAdded(task)
-
-    def getTasksPublic = super.getTasks
     def cancelTaskPublic(uid: String) = super.cancelTask(uid)
-    override def unhandled(any: Any) = super.unhandled(any)
-
   }
 
 
   "TaskManager" should {
-    "create task on message" in {
+
+    "subscribe to TaskManagement on start up" in {
+      val tmActorRef = TestActorRef(new TestTaskManager)
+
+      verify(busMock).subscribe(tmActorRef, classOf[TaskManagement])
+    }
+
+    "handle task create message" in {
       val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
       val tmActorRef = TestActorRef(taskManager)
       val task = Task("task1", "taskA", None, 0.0)
 
       tmActorRef ! NewTask(task, new Message {})
 
-      verify(taskManager).taskAdded(task)
-      val tasks = taskManager.getTasksPublic
-      tasks.size should be(1)
-      tasks.get(task.uid) should be(Some(task))
+      verify(taskManager).onTaskCreated(task)
     }
 
-    "remove task on message" in {
+    "handle task cancel message" in {
       val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
       val tmActorRef = TestActorRef(taskManager)
       val task = Task("task1", "taskA", None, 0.0)
@@ -53,24 +53,10 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskCancelled(task.uid)
 
-      verify(taskManager).taskRemoved(task.uid)
-      val tasks = taskManager.getTasksPublic
-      tasks.size should be(0)
+      verify(taskManager).onTaskCancelled(task.uid)
     }
 
-    "cancel task on message" in {
-      val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
-      val tmActorRef = TestActorRef(taskManager)
-      val task = Task("task1", "taskA", None, 0.0)
-      val cancellationMsg = new Message {}
-      tmActorRef ! NewTask(task, cancellationMsg)
-
-      tmActorRef ! CancelTask(task.uid)
-
-      verify(busMock).publish(cancellationMsg)
-    }
-
-    "cancel task on call" in {
+    "cancel existing task on method call" in {
       val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
       val tmActorRef = TestActorRef(taskManager)
       val task = Task("task1", "taskA", None, 0.0)
@@ -82,30 +68,29 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
       verify(busMock).publish(cancellationMsg)
     }
 
-    "update existing task on message" in {
-      val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
-      val tmActorRef = TestActorRef(taskManager)
-
-      tmActorRef ! TaskProgressUpdate("someUid", 0.0)
-      //TODO add assertions
-    }
-
-    "handle update of not existing task on message" in {
+    "throw IAException when cancelling not existing task" in {
       val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
       val tmActorRef = TestActorRef(taskManager)
       val task = Task("task1", "taskA", None, 0.0)
-      val updatedTask = task.copy(progress = 0.9)
-      val cancellationMsg = new Message {}
-      tmActorRef ! NewTask(task, cancellationMsg)
 
-      tmActorRef ! TaskProgressUpdate(task.uid, updatedTask.progress)
+      intercept[IllegalArgumentException] {
+        taskManager.cancelTaskPublic(task.uid)
+      }
 
-      val tasks = taskManager.getTasksPublic
-      tasks.size should be(1)
-      tasks.get(task.uid) should be( Some(updatedTask))
     }
 
-    "remove finished task" in {
+
+    "update task on message" in {
+      val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
+      val tmActorRef = TestActorRef(taskManager)
+      val (uid, progress) = ("someUid", 0.0)
+
+      tmActorRef ! TaskProgressUpdate(uid, progress)
+
+      verify(taskManager).onTaskProgressUpdated(uid, progress)
+    }
+
+    "handle finished task" in {
       val taskManager = spy(TestActorRef(new TestTaskManager).underlyingActor)
       val tmActorRef = TestActorRef(taskManager)
       val task = Task("task1", "taskA", None, 0.0)
@@ -115,8 +100,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskProgressUpdate(task.uid, finishedTask.progress)
 
-      taskManager.getTasksPublic.size should be(0)
-      verify(taskManager).taskUpdated(finishedTask)
+      verify(taskManager).onTaskFinished(task.uid)
     }
 
     "be aware of other messages" in {

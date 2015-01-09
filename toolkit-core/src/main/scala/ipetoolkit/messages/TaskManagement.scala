@@ -10,6 +10,4 @@ case class TaskProgressUpdate(uid:String, progress:Double) extends TaskManagemen
 
 case class TaskCancelled(uid:String) extends TaskManagement
 
-case class CancelTask(uid:String) extends TaskManagement
-
 

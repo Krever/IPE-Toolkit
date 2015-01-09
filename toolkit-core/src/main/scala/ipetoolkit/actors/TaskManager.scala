@@ -13,48 +13,40 @@ import scala.collection.mutable
  * Controller of long running tasks in system.
  *
  * Reacts to following messages:
- * $ [[NewTask]] - Adds task and cancellation message to list
- * $ [[TaskProgressUpdate]] - Updates tasks progress. If progress is equal to 1, task is removed from list.
- * $ [[TaskCancelled]] - Removes task from list
- * $ [[CancelTask]] - Publishes cancellation message on event bus
+ * $ [[NewTask]] - [[TaskManager#onTaskCreated]] is called
+ * $ [[TaskProgressUpdate]] - [[TaskManager#onTaskProgressUpdated]] is called if progress != 0 else [[TaskManager#onTaskFinished]] is called
+ * $ [[TaskCancelled]] - [[TaskManager#onTaskCancelled]] is called
  *
  * */
-class TaskManager(eventBus :CentralEventBus) extends Actor{
+class TaskManager(implicit val eventBus :CentralEventBus) extends Actor{
 
-  private val runningTasks: mutable.Map[String, (Task,Message)] = mutable.Map()
+  private val cancellationMessages: mutable.Map[String, Message] = mutable.Map()
   private val log = Logging(context.system, this)
 
+
+  @throws[Exception](classOf[Exception])
+  override def preStart(): Unit = eventBus.subscribe(self, classOf[TaskManagement])
 
   override final def receive: Receive = {
     case tm :TaskManagement => tm match {
       case NewTask(task, cancellationMsg) =>
-        log.info("Adding task: {}", task)
-        runningTasks(task.uid) = (task, cancellationMsg)
-        taskAdded(task)
+        log.info("New task: {}", task)
+        cancellationMessages.put(task.uid,cancellationMsg)
+        onTaskCreated(task)
 
       case TaskProgressUpdate(uid, progress) =>
         log.info("Updating task({}) with progress: {}", uid, progress)
-        runningTasks.get(uid) match {
-          case Some((task, msg)) =>
-            val updatedTask = task.copy(progress = progress)
-            taskUpdated(updatedTask)
-            if(progress != 1.0)
-              runningTasks.put(task.uid, (updatedTask, msg))
-            else
-              runningTasks.remove(task.uid)
-          case None =>
-            log.warning("Updating not existing task")
-            //TODO publish warn message
-
+        if(progress == 1.0){
+          cancellationMessages.remove(uid)
+          onTaskFinished(uid)
         }
-
+        else
+          onTaskProgressUpdated(uid, progress)
 
       case TaskCancelled(uid) =>
         log.info("Removing task with uid: {}", uid)
-        runningTasks.remove(uid)
-        taskRemoved(uid)
-
-      case CancelTask(uid) => cancelTask(uid)
+        cancellationMessages.remove(uid)
+        onTaskCancelled(uid)
     }
   }
 
@@ -63,19 +55,22 @@ class TaskManager(eventBus :CentralEventBus) extends Actor{
     super.unhandled(message)
   }
 
+  @throws[IllegalArgumentException]
   protected final def cancelTask(uid:String) = {
     log.info("Cancelling task with uid: {}", uid)
-    val (_, cancellationMsg) = runningTasks(uid)
-    eventBus.publish(cancellationMsg)
+    cancellationMessages.get(uid) match {
+      case Some(cancellationMsg) => eventBus.publish(cancellationMsg)
+      case None =>
+        log.warning("Cancellation message not found for uid: {}", uid)
+        throw new IllegalArgumentException("cancellation message not found")
+    }
   }
 
-  protected final def getTasks :Map[String, Task]= runningTasks.map(e => e._1 -> e._2._1).toMap
+  protected def onTaskCreated(task:Task) :Unit= {}
 
-  protected def taskUpdated(task:Task) :Unit= {}
+  protected def onTaskProgressUpdated(uid:String, progress:Double) :Unit= {}
 
-  protected def taskRemoved(uid:String) :Unit= {}
+  protected def onTaskCancelled(uid:String) :Unit= {}
 
-  protected def taskAdded(task:Task) :Unit= {}
-
-
+  protected def onTaskFinished(uid:String) :Unit= {}
 }
