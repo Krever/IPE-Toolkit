@@ -56,7 +56,7 @@ class TaskManager(implicit val eventBus :CentralEventBus) extends Actor{
   }
 
   @throws[IllegalArgumentException]
-  protected final def cancelTask(uid:String) = {
+  protected final def _cancelTask(uid:String) = {
     log.info("Cancelling task with uid: {}", uid)
     cancellationMessages.get(uid) match {
       case Some(cancellationMsg) => eventBus.publish(cancellationMsg)

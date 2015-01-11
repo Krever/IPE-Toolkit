@@ -23,7 +23,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
     override def onTaskCreated(task: Task): Unit = super.onTaskCreated(task)
     override def onTaskFinished(uid: String): Unit = super.onTaskFinished(uid)
 
-    def cancelTaskPublic(uid: String) = super.cancelTask(uid)
+    def cancelTaskPublic(uid: String) = super._cancelTask(uid)
   }
 
 
