@@ -1,6 +1,7 @@
 package ipetoolkit.actors
 
-import akka.actor.Actor
+import akka.actor.TypedActor.{PreStart, Receiver}
+import akka.actor.{ActorRef, TypedActor}
 import akka.event.Logging
 import ipetoolkit.bus.CentralEventBus
 import ipetoolkit.messages._
@@ -8,26 +9,27 @@ import ipetoolkit.model.Task
 
 import scala.collection.mutable
 
+trait TaskManager {
+  def cancelTask(uid: String): Unit
+}
 
 /**
  * Controller of long running tasks in system.
  *
  * Reacts to following messages:
- * $ [[NewTask]] - [[TaskManager#onTaskCreated]] is called
- * $ [[TaskProgressUpdate]] - [[TaskManager#onTaskProgressUpdated]] is called if progress != 0 else [[TaskManager#onTaskFinished]] is called
- * $ [[TaskCancelled]] - [[TaskManager#onTaskCancelled]] is called
+ * $ [[NewTask]] - [[TaskManagerBase#onTaskCreated]] is called
+ * $ [[TaskProgressUpdate]] - [[TaskManagerBase#onTaskProgressUpdated]] is called if progress != 0 else [[TaskManagerBase#onTaskFinished]] is called
+ * $ [[TaskCancelled]] - [[TaskManagerBase#onTaskCancelled]] is called
  *
  * */
-class TaskManager(implicit val eventBus :CentralEventBus) extends Actor{
+class TaskManagerBase(implicit val eventBus: CentralEventBus) extends TaskManager with Receiver with PreStart {
 
+  private lazy val log = Logging(TypedActor.context.system, TypedActor.context.self)
   private val cancellationMessages: mutable.Map[String, Message] = mutable.Map()
-  private val log = Logging(context.system, this)
 
+  override def preStart(): Unit = eventBus.subscribe(TypedActor.context.self, classOf[TaskManagement])
 
-  @throws[Exception](classOf[Exception])
-  override def preStart(): Unit = eventBus.subscribe(self, classOf[TaskManagement])
-
-  override final def receive: Receive = {
+  override def onReceive(message: Any, sender: ActorRef): Unit = message match {
     case tm :TaskManagement => tm match {
       case NewTask(task, cancellationMsg) =>
         log.info("New task: {}", task)
@@ -50,22 +52,6 @@ class TaskManager(implicit val eventBus :CentralEventBus) extends Actor{
     }
   }
 
-  override def unhandled(message: Any): Unit = {
-    log.warning("Unhandled message: {}", message)
-    super.unhandled(message)
-  }
-
-  @throws[IllegalArgumentException]
-  protected final def _cancelTask(uid:String) = {
-    log.info("Cancelling task with uid: {}", uid)
-    cancellationMessages.get(uid) match {
-      case Some(cancellationMsg) => eventBus.publish(cancellationMsg)
-      case None =>
-        log.warning("Cancellation message not found for uid: {}", uid)
-        throw new IllegalArgumentException("cancellation message not found")
-    }
-  }
-
   protected def onTaskCreated(task:Task) :Unit= {}
 
   protected def onTaskProgressUpdated(uid:String, progress:Double) :Unit= {}
@@ -73,4 +59,13 @@ class TaskManager(implicit val eventBus :CentralEventBus) extends Actor{
   protected def onTaskCancelled(uid:String) :Unit= {}
 
   protected def onTaskFinished(uid:String) :Unit= {}
+
+  override def cancelTask(uid: String) = {
+    log.info("Cancelling task with uid: {}", uid)
+    cancellationMessages.get(uid) match {
+      case Some(cancellationMsg) => eventBus.publish(cancellationMsg)
+      case None =>
+        log.warning("Cancellation message not found for uid: {}", uid)
+    }
+  }
 }

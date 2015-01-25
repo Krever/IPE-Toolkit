@@ -1,4 +1,4 @@
-package ipetoolkit.actors
+package ipetoolkit.util
 
 import java.util.Collections
 import java.util.concurrent.{AbstractExecutorService, ExecutorService, ThreadFactory, TimeUnit}
@@ -29,4 +29,8 @@ class JavaFXEventThreadExecutorServiceConfigurator(config: Config, prerequisites
   }
 
   def createExecutorServiceFactory(id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = f
+}
+
+object JavaFXDispatcher {
+  val Id = "javafx-dispatcher"
 }

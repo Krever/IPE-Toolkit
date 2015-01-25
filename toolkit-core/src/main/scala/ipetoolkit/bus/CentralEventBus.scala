@@ -1,7 +1,7 @@
 package ipetoolkit.bus
 
 import akka.actor.ActorRef
-import akka.event.{SubchannelClassification, EventBus}
+import akka.event.{EventBus, SubchannelClassification}
 import akka.util.Subclassification
 import ipetoolkit.messages.Message
 
@@ -20,7 +20,7 @@ class CentralEventBus extends EventBus with SubchannelClassification  {
   override protected implicit def subclassification: Subclassification[Classifier] = new ClassSubclassification
 }
 
-class ClassSubclassification extends Subclassification[Class[_]] {
+private class ClassSubclassification extends Subclassification[Class[_]] {
   override def isEqual(x: Class[_], y: Class[_]): Boolean =
     x.equals(y)
 
