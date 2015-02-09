@@ -1,4 +1,6 @@
-package ipetoolkit.model
+package ipetoolkit.task
+
+import ipetoolkit.util.Identifiable
 
 /**
  * Base class for long running tasks.

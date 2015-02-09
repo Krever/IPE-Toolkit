@@ -3,7 +3,7 @@ package ipetoolkit.bus
 import akka.actor.ActorRef
 import akka.event.{EventBus, SubchannelClassification}
 import akka.util.Subclassification
-import ipetoolkit.messages.Message
+import ipetoolkit.util.Message
 
 /**
  * Event bus used across the system

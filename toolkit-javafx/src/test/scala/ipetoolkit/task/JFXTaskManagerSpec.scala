@@ -1,11 +1,10 @@
-package ipetoolkit.actors
+package ipetoolkit.task
 
 import javafx.collections.{FXCollections, ObservableList}
 
 import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import akka.testkit.CallingThreadDispatcher
 import ipetoolkit.bus.CentralEventBus
-import ipetoolkit.model.Task
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
 

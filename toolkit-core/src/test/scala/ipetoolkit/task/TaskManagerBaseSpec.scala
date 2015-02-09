@@ -1,10 +1,9 @@
-package ipetoolkit.actors
+package ipetoolkit.task
 
 import akka.actor._
 import akka.testkit.{CallingThreadDispatcher, ImplicitSender, TestKit}
 import ipetoolkit.bus.CentralEventBus
-import ipetoolkit.messages._
-import ipetoolkit.model.Task
+import ipetoolkit.util.Message
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}

@@ -1,6 +1,6 @@
-package ipetoolkit.messages
+package ipetoolkit.task
 
-import ipetoolkit.model.Task
+import ipetoolkit.util.Message
 
 sealed trait TaskManagement extends Message
 

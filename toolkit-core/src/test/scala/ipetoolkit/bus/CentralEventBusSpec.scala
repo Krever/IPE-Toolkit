@@ -2,8 +2,8 @@ package ipetoolkit.bus
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
+import ipetoolkit.util.Message
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
-import ipetoolkit.messages.Message
 
 
 class CentralEventBusSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender

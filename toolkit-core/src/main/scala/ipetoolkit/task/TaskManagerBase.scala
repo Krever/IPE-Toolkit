@@ -1,11 +1,10 @@
-package ipetoolkit.actors
+package ipetoolkit.task
 
 import akka.actor.TypedActor.{PreStart, Receiver}
 import akka.actor.{ActorRef, TypedActor}
 import akka.event.Logging
 import ipetoolkit.bus.CentralEventBus
-import ipetoolkit.messages._
-import ipetoolkit.model.Task
+import ipetoolkit.util.Message
 
 import scala.collection.mutable
 

@@ -1,12 +1,11 @@
-package ipetoolkit.actors
+package ipetoolkit.task
 
 import javafx.collections.ObservableList
 
 import akka.actor.{TypedActor, TypedProps}
 import akka.event.Logging
 import ipetoolkit.bus.CentralEventBus
-import ipetoolkit.model.{Identifiable, Task}
-import ipetoolkit.util.JavaFXDispatcher
+import ipetoolkit.util.{Identifiable, JavaFXDispatcher}
 
 import scala.collection.JavaConverters._
 

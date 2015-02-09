@@ -1,4 +1,4 @@
-package ipetoolkit.model
+package ipetoolkit.util
 
 /**
  * Identifiable object
