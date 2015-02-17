@@ -2,18 +2,15 @@ package ipetoolkit.task
 
 import javafx.collections.ObservableList
 
-import akka.actor.{TypedActor, TypedProps}
-import akka.event.Logging
-import ipetoolkit.bus.CentralEventBus
+import akka.actor.TypedProps
+import ipetoolkit.bus.ClassBasedEventBusLike
 import ipetoolkit.util.{Identifiable, JavaFXDispatcher}
 
 import scala.collection.JavaConverters._
 
 
-class JFXTaskManager protected(taskList: ObservableList[Task])(override implicit val eventBus: CentralEventBus)
+class JFXTaskManager protected(taskList: ObservableList[Task])(override implicit val eventBus: ClassBasedEventBusLike)
   extends TaskManagerBase with TaskManager {
-
-  private lazy val log = Logging(TypedActor.context.system, TypedActor.context.self)
 
   override protected def onTaskCreated(task: Task): Unit = {
     taskList.add(task)
@@ -29,24 +26,15 @@ class JFXTaskManager protected(taskList: ObservableList[Task])(override implicit
     }
   }
 
-  override protected def onTaskCancelled(uid: String): Unit = JFXTaskManager.removeTask(uid, taskList)
+  override protected def onTaskCancelled(uid: String): Unit = taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_)) //JFXTaskManager.removeTask(uid, taskList)
 
-  override protected def onTaskFinished(uid: String): Unit = JFXTaskManager.removeTask(uid, taskList)
+  override protected def onTaskFinished(uid: String): Unit = taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_))
 }
 
 object JFXTaskManager {
 
-  def typedProps(taskList: ObservableList[Task])(implicit eventBus: CentralEventBus): TypedProps[_ <: TaskManager] = {
+  def typedProps(taskList: ObservableList[Task])(implicit eventBus: ClassBasedEventBusLike): TypedProps[_ <: TaskManager] = {
     TypedProps(classOf[TaskManager], new JFXTaskManager(taskList)).withDispatcher(JavaFXDispatcher.Id)
   }
 
-
-  private def removeTask(uid: String, list: ObservableList[Task]): Boolean = {
-    Identifiable.findIndex(uid, list.asScala) match {
-      case Some(index) =>
-        list.remove(index)
-        true
-      case None => false
-    }
-  }
 }

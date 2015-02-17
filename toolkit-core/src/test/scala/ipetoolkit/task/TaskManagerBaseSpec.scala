@@ -2,7 +2,7 @@ package ipetoolkit.task
 
 import akka.actor._
 import akka.testkit.{CallingThreadDispatcher, ImplicitSender, TestKit}
-import ipetoolkit.bus.CentralEventBus
+import ipetoolkit.bus.ClassBasedEventBusLike
 import ipetoolkit.util.Message
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -14,24 +14,19 @@ import scala.language.postfixOps
 class TaskManagerBaseSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
 with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
-  val busMock = mock[CentralEventBus]
+  val busMock = mock[ClassBasedEventBusLike]
 
   def this() = this(ActorSystem("TaskManagerSpec"))
 
 
   "TaskManagerBase" should {
 
-    "subscribe to TaskManagement on start up" in {
-      val (taskManager, tmActorRef) = testObjects
-
-      verify(busMock).subscribe(tmActorRef, classOf[TaskManagement])
-    }
 
     "handle task create message" in {
       val (taskManager, tmActorRef) = testObjects
       val task = Task("task1", "taskA", None, 0.0)
 
-      tmActorRef ! NewTask(task, new Message {})
+      tmActorRef ! TaskStarted(task, new Message {})
 
       expectMsg(OnTaskCreated(task))
     }
@@ -39,7 +34,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
     "handle task cancel message" in {
       val (taskManager, tmActorRef) = testObjects
       val task = Task("task1", "taskA", None, 0.0)
-      tmActorRef ! NewTask(task, new Message {})
+      tmActorRef ! TaskStarted(task, new Message {})
 
       tmActorRef ! TaskCancelled(task.uid)
 
@@ -51,7 +46,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
       val (taskManager, tmActorRef) = testObjects
       val task = Task("task1", "taskA", None, 0.0)
       val cancellationMsg = new Message {}
-      tmActorRef ! NewTask(task, cancellationMsg)
+      tmActorRef ! TaskStarted(task, cancellationMsg)
 
       taskManager.cancelTask_Sync(task.uid)
 
@@ -73,7 +68,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
       val task = Task("task1", "taskA", None, 0.0)
       val finishedTask = task.copy(progress = 1.0)
       val cancellationMsg = new Message {}
-      tmActorRef ! NewTask(task, cancellationMsg)
+      tmActorRef ! TaskStarted(task, cancellationMsg)
 
       tmActorRef ! TaskProgressUpdate(task.uid, finishedTask.progress)
 
@@ -106,7 +101,10 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
   case class OnTaskFinished(uid: String)
 
-  class TestTaskManagerBase extends TaskManagerBase()(busMock) with CancelTask_Sync {
+  class TestTaskManagerBase extends TaskManagerBase with CancelTask_Sync {
+
+    override val eventBus = busMock
+
     override def onTaskProgressUpdated(uid: String, progress: Double): Unit = testActor ! OnTaskProgressUpdated(uid, progress)
 
     override def onTaskCancelled(uid: String): Unit = testActor ! OnTaskCancelled(uid)

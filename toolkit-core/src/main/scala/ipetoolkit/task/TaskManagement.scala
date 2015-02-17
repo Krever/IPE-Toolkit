@@ -4,7 +4,7 @@ import ipetoolkit.util.Message
 
 sealed trait TaskManagement extends Message
 
-case class NewTask(task:Task, cancellationMsg:Message) extends TaskManagement
+case class TaskStarted(task: Task, cancellationMsg: Message) extends TaskManagement
 
 case class TaskProgressUpdate(uid:String, progress:Double) extends TaskManagement
 

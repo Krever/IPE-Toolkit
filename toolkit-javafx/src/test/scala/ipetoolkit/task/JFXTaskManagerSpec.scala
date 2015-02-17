@@ -2,15 +2,15 @@ package ipetoolkit.task
 
 import javafx.collections.{FXCollections, ObservableList}
 
-import akka.actor.{ActorSystem, TypedActor, TypedProps}
+import akka.actor.{TypedActor, TypedProps}
 import akka.testkit.CallingThreadDispatcher
-import ipetoolkit.bus.CentralEventBus
+import ipetoolkit.bus.ClassBasedEventBus
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{Matchers, WordSpec}
 
 class JFXTaskManagerSpec extends WordSpec with Matchers with MockitoSugar {
 
-  private implicit val eventBus = new CentralEventBus
+  private implicit val eventBus = new ClassBasedEventBus
   private implicit val actorSystem = ActorSystem("JFXTaskManagerSpec")
 
   "JFXTaskManager" should {
