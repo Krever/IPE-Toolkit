@@ -4,20 +4,18 @@ import javafx.collections.ObservableList
 
 import akka.actor.TypedProps
 import ipetoolkit.bus.ClassBasedEventBusLike
-import ipetoolkit.util.{Identifiable, JavaFXDispatcher}
+import ipetoolkit.util.JavaFXDispatcher
 
 import scala.collection.JavaConverters._
 
 
 class JFXTaskManager protected(taskList: ObservableList[Task])(override implicit val eventBus: ClassBasedEventBusLike)
-  extends TaskManagerBase with TaskManager {
+  extends TaskManagerBase {
 
-  override protected def onTaskCreated(task: Task): Unit = {
-    taskList.add(task)
-  }
+  override protected val onTaskCreated: (Task) => Unit = task => taskList.add(task)
 
-  override protected def onTaskProgressUpdated(uid: String, progress: Double): Unit = {
-    Identifiable.findIndex(uid, taskList.asScala) match {
+  override protected val onTaskProgressUpdated: (String, Double) => Unit = (uid, progress) => {
+    taskList.asScala.zipWithIndex.find(_._1.uid == uid).map(_._2) match {
       case Some(taskIndex) =>
         val task = taskList.get(taskIndex)
         taskList.remove(taskIndex)
@@ -26,9 +24,9 @@ class JFXTaskManager protected(taskList: ObservableList[Task])(override implicit
     }
   }
 
-  override protected def onTaskCancelled(uid: String): Unit = taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_)) //JFXTaskManager.removeTask(uid, taskList)
+  override protected val onTaskCancelled: (String) => Unit = uid => taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_)) //JFXTaskManager.removeTask(uid, taskList)
 
-  override protected def onTaskFinished(uid: String): Unit = taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_))
+  override protected val onTaskFinished: (String) => Unit = uid => taskList.asScala.filter(_.uid == uid).foreach(taskList.remove(_))
 }
 
 object JFXTaskManager {

@@ -15,10 +15,16 @@ class TaskManagerBaseSpec(_system: ActorSystem) extends TestKit(_system) with Im
 with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
   val busMock = mock[ClassBasedEventBusLike]
+  val onTaskCreated: (Task) => Unit = mock[(Task) => Unit]
+  val onTaskProgressUpdated: (String, Double) => Unit = mock[(String, Double) => Unit]
+  val onTaskCancelled: (String) => Unit = mock[(String) => Unit]
+  val onTaskFinished: (String) => Unit = mock[(String) => Unit]
 
   def this() = this(ActorSystem("TaskManagerSpec"))
 
-
+  val callTimeout = timeout(1000)
+  
+  
   "TaskManagerBase" should {
 
 
@@ -28,7 +34,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskStarted(task, new Message {})
 
-      expectMsg(OnTaskCreated(task))
+      verify(onTaskCreated, callTimeout).apply(task)
     }
 
     "handle task cancel message" in {
@@ -38,8 +44,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskCancelled(task.uid)
 
-      expectMsgClass(classOf[OnTaskCreated])
-      expectMsg(OnTaskCancelled(task.uid))
+      verify(onTaskCancelled, callTimeout).apply(task.uid)
     }
 
     "cancel existing task on method call" in {
@@ -48,9 +53,9 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
       val cancellationMsg = new Message {}
       tmActorRef ! TaskStarted(task, cancellationMsg)
 
-      taskManager.cancelTask_Sync(task.uid)
+      taskManager.cancelTask(task.uid)
 
-      verify(busMock).publish(cancellationMsg)
+      verify(busMock, callTimeout).publish(cancellationMsg)
     }
 
     "update task on message" in {
@@ -59,8 +64,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskProgressUpdate(uid, progress)
 
-      expectMsgClass(classOf[OnTaskCreated])
-      expectMsg(OnTaskProgressUpdated(uid, progress))
+      verify(onTaskProgressUpdated, callTimeout).apply(uid, progress)
     }
 
     "handle finished task" in {
@@ -72,46 +76,23 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       tmActorRef ! TaskProgressUpdate(task.uid, finishedTask.progress)
 
-      expectMsgClass(classOf[OnTaskCreated])
-      expectMsg(OnTaskFinished(task.uid))
+      verify(onTaskFinished, callTimeout)
     }
   }
 
-  private def testObjects: (CancelTask_Sync, ActorRef) = {
+  private def testObjects: (TaskManager, ActorRef) = {
     val typedActor = TypedActor(system).typedActorOf(
-      TypedProps(classOf[CancelTask_Sync], new TestTaskManagerBase)
+      TypedProps(classOf[TaskManager], new TestTaskManagerBase)
         .withDispatcher(CallingThreadDispatcher.Id)
     )
     val tmActorRef: ActorRef = TypedActor(system).getActorRefFor(typedActor)
     (typedActor, tmActorRef)
   }
 
-  trait CancelTask_Sync extends TaskManager {
-    def cancelTask_Sync(uid: String): Int = {
-      cancelTask(uid)
-      1
-    }
-  }
-
-  case class OnTaskProgressUpdated(uid: String, progress: Double)
-
-  case class OnTaskCancelled(uid: String)
-
-  case class OnTaskCreated(task: Task)
-
-  case class OnTaskFinished(uid: String)
-
-  class TestTaskManagerBase extends TaskManagerBase with CancelTask_Sync {
-
+  class TestTaskManagerBase extends TaskManagerBase(onTaskCreated, onTaskProgressUpdated, onTaskCancelled, onTaskFinished) {
     override val eventBus = busMock
 
-    override def onTaskProgressUpdated(uid: String, progress: Double): Unit = testActor ! OnTaskProgressUpdated(uid, progress)
-
-    override def onTaskCancelled(uid: String): Unit = testActor ! OnTaskCancelled(uid)
-
-    override def onTaskCreated(task: Task): Unit = testActor ! OnTaskCreated(task)
-
-    override def onTaskFinished(uid: String): Unit = testActor ! OnTaskFinished(uid)
+    override def cancelTask(uid: String) = super.cancelTask(uid)
   }
 
 }

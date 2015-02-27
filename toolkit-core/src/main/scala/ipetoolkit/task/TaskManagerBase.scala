@@ -17,7 +17,11 @@ trait TaskManager {
  * $ [[TaskCancelled]] - [[TaskManagerBase#onTaskCancelled]] is called
  *
  **/
-class TaskManagerBase extends Manager[TaskManagement] with TaskManager {
+class TaskManagerBase(protected val onTaskCreated: (Task) => Unit = _ => {},
+                      protected val onTaskProgressUpdated: (String, Double) => Unit = (_, _) => {},
+                      protected val onTaskCancelled: (String) => Unit = _ => {},
+                      protected val onTaskFinished: (String) => Unit = _ => {})
+  extends Manager[TaskManagement] with TaskManager {
 
   private val cancellationMessages: mutable.Map[String, Message] = mutable.Map()
 
@@ -41,14 +45,6 @@ class TaskManagerBase extends Manager[TaskManagement] with TaskManager {
       cancellationMessages.remove(uid)
       onTaskCancelled(uid)
   }
-
-  protected def onTaskCreated(task: Task): Unit = {}
-
-  protected def onTaskProgressUpdated(uid: String, progress: Double): Unit = {}
-
-  protected def onTaskCancelled(uid: String): Unit = {}
-
-  protected def onTaskFinished(uid: String): Unit = {}
 
   override def cancelTask(uid: String) = {
     log.info("Cancelling task with uid: {}", uid)

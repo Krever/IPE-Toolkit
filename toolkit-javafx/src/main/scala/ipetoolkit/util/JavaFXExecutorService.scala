@@ -20,7 +20,7 @@ object JavaFXExecutorService extends AbstractExecutorService {
 
   def isTerminated = false
 
-  def awaitTermination(l: Long, timeUnit: TimeUnit) = true
+  def awaitTermination(l: Long, timeUnit: TimeUnit) = false
 }
 
 class JavaFXEventThreadExecutorServiceConfigurator(config: Config, prerequisites: DispatcherPrerequisites) extends ExecutorServiceConfigurator(config, prerequisites) {
