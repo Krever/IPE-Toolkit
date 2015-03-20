@@ -19,6 +19,7 @@ lazy val javafxBackend = project
 
 libraryDependencies in ThisBuild ++= Seq(
   "com.typesafe.akka" % "akka-actor_2.11" % "2.3.7"
+  , "org.scala-lang.modules" %% "scala-xml" % "1.0.3"
   , "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
   , "org.mockito" % "mockito-core" % "2.0.3-beta" % "test"
   , "com.typesafe.akka" % "akka-testkit_2.11" % "2.3.7" % "test"
