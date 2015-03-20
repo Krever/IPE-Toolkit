@@ -20,8 +20,6 @@ trait ClassBasedEventBusLike extends EventBus with SubchannelClassification {
   override protected implicit def subclassification: Subclassification[Classifier] = new ClassSubclassification
 }
 
-class ClassBasedEventBus extends ClassBasedEventBusLike
-
 private class ClassSubclassification extends Subclassification[Class[_]] {
   override def isEqual(x: Class[_], y: Class[_]): Boolean =
     x.equals(y)
@@ -29,5 +27,7 @@ private class ClassSubclassification extends Subclassification[Class[_]] {
   override def isSubclass(x: Class[_], y: Class[_]): Boolean =
     y.isAssignableFrom(x)
 }
+
+class ClassBasedEventBus extends ClassBasedEventBusLike
 
 object IPEEventBus extends ClassBasedEventBusLike
