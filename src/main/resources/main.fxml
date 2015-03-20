@@ -24,7 +24,7 @@
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <Button onAction="#someAction" mnemonicParsing="false" text="Entry 1"/>
-            <Button mnemonicParsing="false" text="Entry 2"/>
+
         </ToolBar>
     </top>
 </BorderPane>
