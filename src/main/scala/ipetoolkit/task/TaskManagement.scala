@@ -8,6 +8,9 @@ case class TaskStarted(task: Task, cancellationMsg: Message) extends TaskManagem
 
 case class TaskProgressUpdate(uid:String, progress:Double) extends TaskManagement
 
-case class TaskCancelled(uid:String) extends TaskManagement
+case class TaskStopped(uid: String, cause: Option[Throwable] = None) extends TaskManagement
+
+
+case class CancelTask(uid: String) extends TaskManagement
 
 

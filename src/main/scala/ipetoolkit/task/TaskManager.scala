@@ -2,7 +2,7 @@ package ipetoolkit.task
 
 import javafx.collections.ObservableList
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import akka.event.EventBus
 
 
@@ -15,5 +15,5 @@ class TaskManager(taskList: ObservableList[Task])(implicit val eventBus: EventBu
 }
 
 object TaskManager {
-  def props(taskList: ObservableList[Task]) = Props(new TaskManager(taskList))
+  def props(taskList: ObservableList[Task])(implicit eventBus: EventBus) = Props(new TaskManager(taskList))
 }

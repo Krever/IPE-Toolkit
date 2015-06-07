@@ -8,10 +8,9 @@ import javafx.scene.control.{Button, Label, ListCell, ListView}
 import javafx.scene.layout.{HBox, Pane, Priority}
 import javafx.util.Callback
 
-import akka.actor.{ActorRef, TypedActor}
+import akka.actor.ActorRef
 import ipetoolkit.bus.IPEEventBus
-import ipetoolkit.task.{JFXTaskManager, TaskManager}
-import ipetoolkit.task.Task
+import ipetoolkit.task.{CancelTask, Task, TaskManager}
 
 class TaskController extends Initializable {
 
@@ -25,7 +24,7 @@ class TaskController extends Initializable {
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
     implicit val eventBus = IPEEventBus
-    taskManager = actorSystem.actorOf(TaskManager.typedProps(taskListView.getItems))
+    taskManager = actorSystem.actorOf(TaskManager.props(taskListView.getItems))
     taskListView.setCellFactory(new Callback[ListView[Task], ListCell[Task]] {
       override def call(param: ListView[Task]): ListCell[Task] = {
         new TaskCell(taskManager)
@@ -34,14 +33,17 @@ class TaskController extends Initializable {
   }
 }
 
-class TaskCell(taskManager: TaskManager) extends ListCell[Task] {
+class TaskCell(taskManager: ActorRef) extends ListCell[Task] {
+
+  //TODO uwzglednic task.cancelRequested
+
   private val name: Label = new Label
   private val pane: Pane = new Pane
   private val hBox: HBox = new HBox
   private val actionBtn: Button = new Button("Cancel")
   actionBtn.setOnAction(new EventHandler[ActionEvent] {
     override def handle(event: ActionEvent): Unit = {
-      taskManager.cancelTask(getItem.uid)
+      taskManager ! CancelTask(getItem.uid)
     }
   })
   hBox.getChildren.addAll(name, pane, actionBtn)

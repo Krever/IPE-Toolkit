@@ -10,4 +10,4 @@ import ipetoolkit.util.Identifiable
  * @param description description
  * @param progress Value between 0 and 1 for progress indication, -1 for undefined
  */
-case class Task(uid: String, name: String, description: Option[String], progress: Double) extends Identifiable
+case class Task(uid: String, name: String, description: Option[String], progress: Double, cancelRequested: Boolean = false) extends Identifiable

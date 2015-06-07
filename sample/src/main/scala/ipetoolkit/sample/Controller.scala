@@ -4,7 +4,7 @@ import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 import ipetoolkit.bus.IPEEventBus
-import ipetoolkit.task.{Task, TaskCancelled, TaskProgressUpdate, TaskStarted}
+import ipetoolkit.task.{Task, TaskProgressUpdate, TaskStarted, TaskStopped}
 
 import scala.concurrent.duration.Duration
 
@@ -15,7 +15,7 @@ class Controller {
   def someAction() = {
     val uid = UUID.randomUUID().toString.substring(0, 10)
     val task = Task(uid, "name", None, 0.0)
-    val cancellationMsg = TaskCancelled(task.uid)
+    val cancellationMsg = TaskStopped(task.uid)
     IPEEventBus.publish(TaskStarted(task, cancellationMsg))
 
     //simulate task running
