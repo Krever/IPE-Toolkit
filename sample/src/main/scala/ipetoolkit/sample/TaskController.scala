@@ -8,7 +8,7 @@ import javafx.scene.control.{Button, Label, ListCell, ListView}
 import javafx.scene.layout.{HBox, Pane, Priority}
 import javafx.util.Callback
 
-import akka.actor.TypedActor
+import akka.actor.{ActorRef, TypedActor}
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.task.{JFXTaskManager, TaskManager}
 import ipetoolkit.task.Task
@@ -19,14 +19,13 @@ class TaskController extends Initializable {
   var taskListView: ListView[Task] = _
 
   implicit val actorSystem = Global.actorSystem
-  val typedExtension = TypedActor(actorSystem)
 
-  var taskManager: TaskManager = null
+  var taskManager: ActorRef = null
 
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
     implicit val eventBus = IPEEventBus
-    taskManager = typedExtension.typedActorOf(JFXTaskManager.typedProps(taskListView.getItems))
+    taskManager = actorSystem.actorOf(TaskManager.typedProps(taskListView.getItems))
     taskListView.setCellFactory(new Callback[ListView[Task], ListCell[Task]] {
       override def call(param: ListView[Task]): ListCell[Task] = {
         new TaskCell(taskManager)

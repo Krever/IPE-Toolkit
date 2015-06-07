@@ -6,24 +6,17 @@ organization in ThisBuild  := "pl.codekratisti"
 
 scalaVersion in ThisBuild  := "2.11.4"
 
-lazy val root =
-  project.in(file("."))
-    .dependsOn(core, javafxBackend)
-    .aggregate(core, javafxBackend)
-
-lazy val core = project.in(file("toolkit-core"))
-lazy val javafxBackend = project
-  .in(file("toolkit-javafx"))
-  .dependsOn(core)
-
+val akkaVersion = "2.3.11"
 
 libraryDependencies in ThisBuild ++= Seq(
-  "com.typesafe.akka" % "akka-actor_2.11" % "2.3.7"
-  , "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
+  "com.typesafe.akka" %% "akka-actor" % akkaVersion
+  , "org.scala-lang.modules" %% "scala-xml" % "1.0.3"
+  , "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   , "org.mockito" % "mockito-core" % "2.0.3-beta" % "test"
-  , "com.typesafe.akka" % "akka-testkit_2.11" % "2.3.7" % "test"
+  , "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
 )
 
-scalacOptions in Test ++= Seq("-Yrangepos")
+lazy val root = project.in(file("."))
 
-resolvers ++= Seq("snapshots", "releases").map(Resolver.sonatypeRepo)
+lazy val sample = project.in(file("sample"))
+  .dependsOn(root)
