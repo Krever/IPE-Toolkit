@@ -38,7 +38,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       actor ! TaskStarted(taskA, null)
 
-      taskList.contains(taskA) should be true
+      taskList.contains(taskA) should be(true)
 
     }
 
@@ -53,7 +53,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       actor ! TaskProgressUpdate(taskB.uid, 0.5)
 
-      taskList.size() should be 3
+      taskList.size() should be(3)
       taskList.get(1) shouldEqual taskB.copy(progress = 0.5)
     }
 
@@ -91,7 +91,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
       actor ! TaskStopped(taskA.uid)
 
-      taskList.isEmpty should be true
+      taskList.isEmpty should be(true)
     }
 
   }
