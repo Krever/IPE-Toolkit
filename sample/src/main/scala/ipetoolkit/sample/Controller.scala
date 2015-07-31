@@ -5,12 +5,14 @@ import java.util.concurrent.TimeUnit
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.task.{Task, TaskProgressUpdate, TaskStarted, TaskStopped}
+import ipetoolkit.workspace.AddWorkspaceEntry
 
 import scala.concurrent.duration.Duration
 
 class Controller {
 
   lazy val system = Global.actorSystem
+  implicit val eEventBus = IPEEventBus
 
   def someAction() = {
     val uid = UUID.randomUUID().toString.substring(0, 10)
@@ -29,6 +31,10 @@ class Controller {
     system.scheduler.scheduleOnce(Duration.create(6, TimeUnit.SECONDS)) {
       IPEEventBus.publish(TaskProgressUpdate(uid, 1.0))
     }
+  }
+
+  def addWorkspaceEntry() = {
+    IPEEventBus.publish(AddWorkspaceEntry(BasicWorkspaceEntry(), None))
   }
 
 }

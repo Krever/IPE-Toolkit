@@ -32,5 +32,5 @@ class JavaFXEventThreadExecutorServiceConfigurator(config: Config, prerequisites
 }
 
 object JavaFXDispatcher {
-  val Id = "javafx-dispatcher"
+  val Id = "ipetoolkit.javafx-dispatcher"
 }

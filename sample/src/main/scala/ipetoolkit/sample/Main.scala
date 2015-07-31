@@ -4,7 +4,7 @@ import javafx.application.Application
 import javafx.event.EventHandler
 import javafx.fxml.FXMLLoader
 import javafx.scene.{Parent, Scene}
-import javafx.stage.{WindowEvent, Stage}
+import javafx.stage.{Stage, WindowEvent}
 
 
 class Main extends Application {
@@ -12,7 +12,7 @@ class Main extends Application {
   override def start(primaryStage: Stage): Unit = {
     val root: Parent = FXMLLoader.load(getClass.getResource("/main.fxml"))
     primaryStage.setTitle("Hello World")
-    primaryStage.setScene(new Scene(root, 600, 550))
+    primaryStage.setScene(new Scene(root, 800, 600))
     primaryStage.show()
 
     primaryStage.setOnCloseRequest(new EventHandler[WindowEvent] {

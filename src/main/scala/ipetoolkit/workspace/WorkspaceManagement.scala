@@ -1,9 +1,9 @@
 package ipetoolkit.workspace
 
-/**
- * Created by krever on 7/11/15.
- */
-sealed trait WorkspaceManagement
+import ipetoolkit.util.Message
+
+
+sealed trait WorkspaceManagement extends Message
 
 case class NewWorkspace(dir: String) extends WorkspaceManagement
 
@@ -14,7 +14,7 @@ case class LoadWorkspace(dir: String) extends WorkspaceManagement
 case class GetWorkspace() extends WorkspaceManagement
 
 
-case class AddWorkspaceEntry(entry: WorkspaceEntry) extends WorkspaceManagement
+case class AddWorkspaceEntry(entry: WorkspaceEntry, parentUid: Option[String]) extends WorkspaceManagement
 
 case class RemoveWorkspaceEntry(uid: String) extends WorkspaceManagement
 

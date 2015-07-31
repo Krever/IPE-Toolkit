@@ -19,7 +19,7 @@ class TaskController extends Initializable {
 
   implicit val actorSystem = Global.actorSystem
 
-  var taskManager: ActorRef = null
+  var taskManager: ActorRef = _
 
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
