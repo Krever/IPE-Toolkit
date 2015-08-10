@@ -5,14 +5,16 @@ import java.util.concurrent.TimeUnit
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.task.{Task, TaskProgressUpdate, TaskStarted, TaskStopped}
-import ipetoolkit.workspace.AddWorkspaceEntry
+import ipetoolkit.workspace._
 
 import scala.concurrent.duration.Duration
 
-class Controller {
+class MainController {
 
   lazy val system = Global.actorSystem
   implicit val eEventBus = IPEEventBus
+
+  val workspaceDir = "/tmp/ipetoolkit-test/" //TODO zaminic na popup albo sciezke do user.home
 
   def someAction() = {
     val uid = UUID.randomUUID().toString.substring(0, 10)
@@ -37,5 +39,16 @@ class Controller {
     IPEEventBus.publish(AddWorkspaceEntry(BasicWorkspaceEntry(), None))
   }
 
-}
+  def newWorkspace() = {
+    IPEEventBus.publish(NewWorkspace(workspaceDir, BasicWorkspaceEntry("Root")))
+  }
 
+  def saveWorkspace() = {
+    IPEEventBus.publish(SaveWorkspace())
+  }
+
+  def loadWorkspace() = {
+    IPEEventBus.publish(LoadWorkspace(workspaceDir, BasicWorkspaceEntryDeserializer))
+  }
+
+}

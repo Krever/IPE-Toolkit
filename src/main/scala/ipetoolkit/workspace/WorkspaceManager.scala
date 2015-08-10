@@ -1,5 +1,6 @@
 package ipetoolkit.workspace
 
+import java.io.File
 import javafx.scene.Node
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
 import javafx.util.Callback
@@ -13,6 +14,8 @@ import scala.collection.JavaConverters._
 
 class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBusLike) extends Actor with ActorLogging {
 
+  private var workspaceDir: File = _
+  private val workspaceFileName = "workspace.xml"
 
   @throws[Exception](classOf[Exception])
   override def preStart(): Unit = {
@@ -22,20 +25,32 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
 
 
   override def receive: Receive = {
+    //TODO rodzielic (add,remove)(new,load,save)
     case AddWorkspaceEntry(entry, parentUidOpt) =>
-      if (treeView.getRoot != null) {
         if (parentUidOpt.isEmpty)
           treeView.getRoot.getChildren.add(entry.treeItem)
         else {
           addChild(treeView.getRoot, entry.treeItem, parentUidOpt.get)
         }
-      } else {
-        treeView.setRoot(entry.treeItem)
-      }
+
     case RemoveWorkspaceEntry(uid) =>
-      if (treeView.getRoot.getValue.uid != uid)
         removeItem(uid, treeView.getRoot)
-      else treeView.setRoot(null)
+
+    case NewWorkspace(dir, rootEntry) =>
+      workspaceDir = new File(dir)
+      treeView.setRoot(rootEntry.treeItem)
+    case SaveWorkspace() =>
+      workspaceDir.mkdirs()
+      scala.xml.XML.save(new File(workspaceDir, workspaceFileName).getAbsolutePath, treeView.getRoot.getValue.toXml.get)
+    case LoadWorkspace(dir, loader) =>
+      val xml = scala.xml.XML.loadFile(new File(dir, workspaceFileName))
+      loader.fromXml(xml) match {
+        case Some(rootEntry) =>
+          workspaceDir = new File(dir)
+          treeView.setRoot(rootEntry.treeItem)
+        case None => () //TODO
+      }
+
   }
 
   def addChild(potentialParent: TreeItem[WorkspaceEntry], child: TreeItem[WorkspaceEntry], parentUid: String): Unit = {

@@ -14,4 +14,10 @@ trait WorkspaceEntry extends Identifiable {
 
   def contextMenu: Option[ContextMenu]
 
+  def toXml: Option[xml.Elem]
+
+}
+
+trait WorkspaceEntryDeserializer {
+  def fromXml(xmlElem: xml.Node): Option[WorkspaceEntry]
 }

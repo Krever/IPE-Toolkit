@@ -2,9 +2,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<BorderPane fx:controller="ipetoolkit.sample.Controller" maxHeight="-Infinity" maxWidth="-Infinity"
-            minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
-            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ipetoolkit.sample.MainController">
     <left>
         <fx:include source="workspaceTreeView.fxml" BorderPane.alignment="CENTER"/>
     </left>
@@ -22,8 +22,22 @@
         <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
     </center>
     <top>
+        <!--TODO uporzadkowac, teraz jest menu w srodku toolbara-->
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <Button onAction="#addWorkspaceEntry" mnemonicParsing="false" text="Entry 1"/>
+            <MenuBar>
+                <menus>
+                    <Menu mnemonicParsing="false" text="File">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="New" onAction="#newWorkspace"/>
+                            <MenuItem mnemonicParsing="false" text="Save" onAction="#saveWorkspace"/>
+                            <MenuItem mnemonicParsing="false" text="Load" onAction="#loadWorkspace"/>
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Empty"/>
+                    <Menu mnemonicParsing="false" text="Empty"/>
+                </menus>
+            </MenuBar>
+            <Button mnemonicParsing="false" onAction="#addWorkspaceEntry" text="Entry 1"/>
 
         </ToolBar>
     </top>
