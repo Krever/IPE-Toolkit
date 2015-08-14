@@ -1,6 +1,6 @@
-name := "IPE-Toolkit"
+name := "ipe-toolkit"
 
-version in ThisBuild := "0.1.1-SNAPSHOT"
+version in ThisBuild := "0.1.2-SNAPSHOT"
 
 organization in ThisBuild  := "pl.codekratisti"
 

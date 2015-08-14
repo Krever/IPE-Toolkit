@@ -14,27 +14,24 @@ import scala.collection.JavaConverters._
 
 class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBusLike) extends Actor with ActorLogging {
 
-  private var workspaceDir: File = _
   private val workspaceFileName = "workspace.xml"
+  private var workspaceDir: File = _
 
-  @throws[Exception](classOf[Exception])
-  override def preStart(): Unit = {
-    eventBus.subscribe(self, classOf[WorkspaceManagement])
-    enrichTreeViewCellFactory()
-  }
+  eventBus.subscribe(self, classOf[WorkspaceManagement])
+  Console.out.println("actor")
+  enrichTreeViewCellFactory()
 
+  /*  @throws[Exception](classOf[Exception])
+    override def preStart(): Unit = {
+    }*/
 
+  //TODO rodzielic (add,remove)(new,load,save)
   override def receive: Receive = {
-    //TODO rodzielic (add,remove)(new,load,save)
     case AddWorkspaceEntry(entry, parentUidOpt) =>
-        if (parentUidOpt.isEmpty)
-          treeView.getRoot.getChildren.add(entry.treeItem)
-        else {
-          addChild(treeView.getRoot, entry.treeItem, parentUidOpt.get)
-        }
+      treeView.getRoot.getValue.addChild(entry, parentUidOpt)
 
     case RemoveWorkspaceEntry(uid) =>
-        removeItem(uid, treeView.getRoot)
+      removeItem(uid, treeView.getRoot)
 
     case NewWorkspace(dir, rootEntry) =>
       workspaceDir = new File(dir)
@@ -53,26 +50,18 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
 
   }
 
-  def addChild(potentialParent: TreeItem[WorkspaceEntry], child: TreeItem[WorkspaceEntry], parentUid: String): Unit = {
-    if (potentialParent.getValue.uid == parentUid)
-      potentialParent.getChildren.add(child)
-    else {
-      potentialParent.getChildren.asScala.foreach(addChild(_, child, parentUid))
-    }
-  }
-
-  private def removeItem(uid: String, item: TreeItem[WorkspaceEntry]): Unit = {
-    val filteredItems = item.getChildren.asScala.filter(_.getValue.uid != uid)
-    item.getChildren.setAll(filteredItems.asJava)
-    filteredItems.foreach(removeItem(uid, _))
-  }
-
   private def enrichTreeViewCellFactory(): Unit = {
     //TODO nadpisujemy istniejaca fabrykę uzytkownika, wiec smutno, trzeba wymyslic lepsze rozwiazanie
     val originalCellFactory = treeView.getCellFactory
     treeView.setCellFactory(new Callback[TreeView[WorkspaceEntry], TreeCell[WorkspaceEntry]] {
       override def call(param: TreeView[WorkspaceEntry]): TreeCell[WorkspaceEntry] = new WorkspaceTreeCell
     })
+  }
+
+  private def removeItem(uid: String, item: TreeItem[WorkspaceEntry]): Unit = {
+    val filteredItems = item.getChildren.asScala.filter(_.getValue.uid != uid)
+    item.getChildren.setAll(filteredItems.asJava)
+    filteredItems.foreach(removeItem(uid, _))
   }
 }
 
