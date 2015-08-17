@@ -1,8 +1,10 @@
 package ipetoolkit.workspace
 
 import java.io.File
+import javafx.event.EventHandler
 import javafx.scene.Node
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
+import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 
 import akka.actor.{Actor, ActorLogging, Props}
@@ -21,9 +23,12 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
   Console.out.println("actor")
   enrichTreeViewCellFactory()
 
-  /*  @throws[Exception](classOf[Exception])
-    override def preStart(): Unit = {
-    }*/
+  treeView.setOnMouseClicked(new EventHandler[MouseEvent] {
+    override def handle(event: MouseEvent): Unit = if (event.getClickCount > 1) {
+      val item = treeView.getSelectionModel.getSelectedItem
+      item.getValue.detailsOpener.foreach(eventBus.publish)
+    }
+  })
 
   //TODO rodzielic (add,remove)(new,load,save)
   override def receive: Receive = {

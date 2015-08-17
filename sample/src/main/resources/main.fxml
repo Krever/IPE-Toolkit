@@ -19,7 +19,7 @@
         </TabPane>
     </bottom>
     <center>
-        <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+        <TabPane fx:id="detailsTabPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
     </center>
     <top>
         <!--TODO uporzadkowac, teraz jest menu w srodku toolbara-->
