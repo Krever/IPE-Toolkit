@@ -16,7 +16,7 @@ To use a feature usually you have 3 roads you can go:
 ## Features
 Most of these features are not implemented yet.
 ### Event Bus
-In our design every message between actors is passed through central event bus of type `ipetoolkit.bus.ClassBasedEventBusLike`. It is simple akka.event.EventBus with class-based message classification. 
+In our design every message between actors is passed through central event bus of type `ipetoolkit.bus.ClassBasedEventBus`. It is simple akka.event.EventBus with class-based message classification.
 Every actor takes such bus as a constructor parameter and default value is `ipetoolkit.bus.IPEEventBus`. 
 
 ### Tasks

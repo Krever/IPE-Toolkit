@@ -8,7 +8,7 @@ import ipetoolkit.util.Message
 /**
  * Event bus used across the system
  */
-trait ClassBasedEventBusLike extends EventBus with SubchannelClassification {
+trait ClassBasedEventBus extends EventBus with SubchannelClassification {
   override type Event = Message
   override type Classifier = Class[_]
   override type Subscriber = ActorRef
@@ -28,6 +28,4 @@ private class ClassSubclassification extends Subclassification[Class[_]] {
     y.isAssignableFrom(x)
 }
 
-class ClassBasedEventBus extends ClassBasedEventBusLike
-
-object IPEEventBus extends ClassBasedEventBusLike
+object IPEEventBus extends ClassBasedEventBus

@@ -4,7 +4,7 @@ import javafx.collections.FXCollections
 
 import akka.actor._
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import ipetoolkit.bus.ClassBasedEventBusLike
+import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.Message
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -18,7 +18,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
   def this() = this(ActorSystem("TaskManagerSpec"))
 
-  implicit val eventBus = mock[ClassBasedEventBusLike]
+  implicit val eventBus = mock[ClassBasedEventBus]
 
   "TaskManagerBase" should {
 

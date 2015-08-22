@@ -7,7 +7,7 @@ import javafx.scene.control.TabPane
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.details.DetailsTabPaneManager
-import ipetoolkit.workspace._
+import ipetoolkit.workspace.WorkspaceManagement.{AddWorkspaceEntry, LoadWorkspace, NewWorkspace, SaveWorkspace}
 
 class MainController extends Initializable {
 

@@ -6,7 +6,7 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.control._
 
 import akka.actor.ActorRef
-import ipetoolkit.bus.{ClassBasedEventBusLike, IPEEventBus}
+import ipetoolkit.bus.{ClassBasedEventBus, IPEEventBus}
 import ipetoolkit.workspace._
 
 
@@ -21,7 +21,7 @@ class WorkspaceController extends Initializable {
 
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
-    implicit val eventBus: ClassBasedEventBusLike = IPEEventBus
+    implicit val eventBus: ClassBasedEventBus = IPEEventBus
     workspaceManager = actorSystem.actorOf(WorkspaceManager.props(workspaceTreeView))
   }
 

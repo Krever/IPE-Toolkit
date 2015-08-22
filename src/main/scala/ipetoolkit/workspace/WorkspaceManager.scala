@@ -2,25 +2,24 @@ package ipetoolkit.workspace
 
 import java.io.File
 import javafx.event.EventHandler
-import javafx.scene.Node
 import javafx.scene.control.{TreeCell, TreeItem, TreeView}
 import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 
 import akka.actor.{Actor, ActorLogging, Props}
-import ipetoolkit.bus.ClassBasedEventBusLike
+import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.JavaFXDispatcher
+import ipetoolkit.workspace.WorkspaceManagement._
 import ipetoolkit.workspace.WorkspaceManager.WorkspaceTreeCell
 
 import scala.collection.JavaConverters._
 
-class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBusLike) extends Actor with ActorLogging {
+class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBus) extends Actor with ActorLogging {
 
   private val workspaceFileName = "workspace.xml"
   private var workspaceDir: File = _
 
   eventBus.subscribe(self, classOf[WorkspaceManagement])
-  Console.out.println("actor")
   enrichTreeViewCellFactory()
 
   treeView.setOnMouseClicked(new EventHandler[MouseEvent] {
@@ -32,11 +31,16 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
 
   //TODO rodzielic (add,remove)(new,load,save)
   override def receive: Receive = {
+
     case AddWorkspaceEntry(entry, parentUidOpt) =>
       treeView.getRoot.getValue.addChild(entry, parentUidOpt)
 
     case RemoveWorkspaceEntry(uid) =>
       removeItem(uid, treeView.getRoot)
+
+    case ReplaceWorkspaceEntry(uid, entry) =>
+      replaceEntry(uid, entry.treeItem)
+
 
     case NewWorkspace(dir, rootEntry) =>
       workspaceDir = new File(dir)
@@ -68,34 +72,30 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
     item.getChildren.setAll(filteredItems.asJava)
     filteredItems.foreach(removeItem(uid, _))
   }
+
+  private def replaceEntry(uid: String, item: TreeItem[WorkspaceEntry]): Unit = {
+    val replacedItems = item.getChildren.asScala.map {
+      case elem if elem.getValue.uid == uid => item
+      case elem => elem
+    }
+    item.getChildren.setAll(replacedItems.asJava)
+    replacedItems.foreach(replaceEntry(uid, _))
+  }
 }
 
 object WorkspaceManager {
 
-  def props(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBusLike): Props = Props(new WorkspaceManager(treeView)).withDispatcher(JavaFXDispatcher.Id)
+  def props(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBus): Props = Props(new WorkspaceManager(treeView)).withDispatcher(JavaFXDispatcher.Id)
 
   private class WorkspaceTreeCell extends TreeCell[WorkspaceEntry] {
 
     override def updateItem(item: WorkspaceEntry, empty: Boolean): Unit = {
-      super.updateItem(item, empty)
-      if (empty) {
-        setText(null)
+      if (item != null) {
+        super.updateItem(item, empty)
         setGraphic(null)
-      } else item match {
-        case newNode: Node =>
-          setText(null)
-          val currentNode = getGraphic
-          if (currentNode == null || !currentNode.equals(newNode)) {
-            setGraphic(newNode)
-          }
-        case _ =>
-          setText(if (item == null) "null" else item.toString)
-          setGraphic(null)
-      }
-      if (getItem != null) {
+        textProperty().bindBidirectional(item.nameProperty)
         getItem.contextMenu.foreach(setContextMenu)
       }
-
     }
   }
 

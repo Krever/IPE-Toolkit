@@ -18,7 +18,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll {
   "CentralEventBus" should {
 
     "deliver subscribed message type" in {
-      val bus = new ClassBasedEventBusLike {}
+      val bus = new ClassBasedEventBus {}
       bus.subscribe(testActor, classOf[MsgOne])
       val msg = MsgOne("test")
       bus.publish(msg)
@@ -26,7 +26,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll {
     }
 
     "not deliver not subscribed message type" in {
-      val bus = new ClassBasedEventBusLike {}
+      val bus = new ClassBasedEventBus {}
       bus.subscribe(testActor, classOf[MsgOne])
       val msg = MsgTwoTwo("test")
       bus.publish(msg)
@@ -34,7 +34,7 @@ with WordSpecLike with Matchers with BeforeAndAfterAll {
     }
 
     "deliver subclass of subscribed message type" in {
-      val bus = new ClassBasedEventBusLike {}
+      val bus = new ClassBasedEventBus {}
       bus.subscribe(testActor, classOf[MsgTwo])
       val msg = MsgTwoTwo("test")
       bus.publish(msg)
