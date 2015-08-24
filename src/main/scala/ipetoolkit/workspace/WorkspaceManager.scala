@@ -90,12 +90,20 @@ object WorkspaceManager {
   private class WorkspaceTreeCell extends TreeCell[WorkspaceEntry] {
 
     override def updateItem(item: WorkspaceEntry, empty: Boolean): Unit = {
-      if (item != null) {
-        super.updateItem(item, empty)
+      if(item == null && getItem != null)
+        textProperty().unbindBidirectional(getItem.nameProperty)
+      super.updateItem(item, empty)
+      if (empty) {
+        setText(null)
         setGraphic(null)
+      } else {
         textProperty().bindBidirectional(item.nameProperty)
+        setGraphic(null)
+      }
+      if (getItem != null) {
         getItem.contextMenu.foreach(setContextMenu)
       }
+
     }
   }
 
