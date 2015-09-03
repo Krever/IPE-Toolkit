@@ -27,7 +27,13 @@ trait WorkspaceEntryView {
     treeItem.getChildren.add(workspaceEntry.view.treeItem)
   }
 
+  def removeWorkSpaceEntry() = {
+    model.dispose()
+  }
 
+  private[workspace] def removeWorkSpaceViewFromParent(workspaceEntryView: WorkspaceEntryView) = {
+    treeItem.getChildren.remove(workspaceEntryView.treeItem)
+  }
 
 
 }

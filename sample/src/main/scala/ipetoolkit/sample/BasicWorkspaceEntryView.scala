@@ -16,7 +16,9 @@ class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry) extends Workspace
       override def handle(t: ActionEvent): Unit = addWorkSpaceEntry(new BasicWorkspaceEntry)
     })
     val item2 = new MenuItem("Remove")
-//    item2.setOnAction( )
+    item2.setOnAction( new EventHandler[ActionEvent](){
+      override def handle(t: ActionEvent): Unit = removeWorkSpaceEntry()
+    })
     Some(new ContextMenu(item1, item2))
   }
 

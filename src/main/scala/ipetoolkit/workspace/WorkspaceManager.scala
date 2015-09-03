@@ -36,9 +36,6 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit 
   }
 
   override def receive: Receive = {
-//    case AddWorkspaceEntry(entry, parentUidOpt) =>
-//      treeView.getRoot.getValue.addChild(entry, parentUidOpt)
-
     case NewWorkspace(dir, rootEntry) =>
       workspaceDir = new File(dir)
       treeView.setRoot(rootEntry.view.treeItem)

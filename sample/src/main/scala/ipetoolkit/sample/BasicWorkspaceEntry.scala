@@ -1,14 +1,12 @@
 package ipetoolkit.sample
 
-import java.util.UUID
-
-import ipetoolkit.workspace.{WorkspaceEntry, WorkspaceEntryView}
+import ipetoolkit.workspace.WorkspaceEntry
 
 
-case class BasicWorkspaceEntry(val uid: String = UUID.randomUUID().toString) extends WorkspaceEntry {
+case class BasicWorkspaceEntry() extends WorkspaceEntry {
+
+  override val view = new BasicWorkspaceEntryView(this)
+
   override def serialize(): Unit = ???
 
-  override def view: WorkspaceEntryView = {
-    new BasicWorkspaceEntryView(this)
-  }
 }
