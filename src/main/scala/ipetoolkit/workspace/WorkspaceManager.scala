@@ -14,7 +14,6 @@ import ipetoolkit.workspace.WorkspaceManager.WorkspaceTreeCell
 
 class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit eventBus: ClassBasedEventBus) extends Actor with ActorLogging {
 
-  private val workspaceFileName = "workspace.xml"
   private var workspaceDir: File = _
 
   eventBus.subscribe(self, classOf[WorkspaceManagement])
@@ -28,7 +27,6 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit 
   })
 
   private def enrichTreeViewCellFactory(): Unit = {
-    //TODO nadpisujemy istniejaca fabrykę uzytkownika, wiec smutno, trzeba wymyslic lepsze rozwiazanie
     val originalCellFactory = treeView.getCellFactory
     treeView.setCellFactory(new Callback[TreeView[WorkspaceEntryView], TreeCell[WorkspaceEntryView]] {
       override def call(param: TreeView[WorkspaceEntryView]): TreeCell[WorkspaceEntryView] = new WorkspaceTreeCell
@@ -40,7 +38,6 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit 
       workspaceDir = new File(dir)
       treeView.setRoot(rootEntry.view.treeItem)
   }
-
 
 }
 

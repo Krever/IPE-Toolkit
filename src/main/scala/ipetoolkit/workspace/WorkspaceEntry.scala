@@ -1,16 +1,18 @@
 package ipetoolkit.workspace
 
+import java.util.UUID
+
 import scala.collection.mutable
 
 trait WorkspaceEntry {
 
-  private val children = mutable.ArrayBuffer[WorkspaceEntry]()
+  private var children = mutable.ArrayBuffer[WorkspaceEntry]()
 
   private var parent : WorkspaceEntry = null
 
-  val view : WorkspaceEntryView = null
+  val uuid = UUID.randomUUID().toString
 
-  def serialize()
+  val view : WorkspaceEntryView = null
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
     children += workspaceEntry
