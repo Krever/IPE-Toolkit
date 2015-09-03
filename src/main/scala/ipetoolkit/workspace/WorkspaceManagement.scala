@@ -11,7 +11,7 @@ object WorkspaceManagement {
 
   case class SaveWorkspace() extends WorkspaceManagement
 
-  case class LoadWorkspace(dir: String, loader: WorkspaceEntryDeserializer) extends WorkspaceManagement
+//  case class LoadWorkspace(dir: String, loader: WorkspaceEntryDeserializer) extends WorkspaceManagement
 
   case class GetWorkspace() extends WorkspaceManagement
 

@@ -13,12 +13,11 @@ import ipetoolkit.workspace._
 class WorkspaceController extends Initializable {
 
   @FXML
-  var workspaceTreeView: TreeView[WorkspaceEntry] = _
+  var workspaceTreeView: TreeView[WorkspaceEntryView] = _
 
   implicit val actorSystem = Global.actorSystem
 
   var workspaceManager: ActorRef = _
-
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
     implicit val eventBus: ClassBasedEventBus = IPEEventBus

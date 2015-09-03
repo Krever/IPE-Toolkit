@@ -7,7 +7,7 @@ import javafx.scene.control.TabPane
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.details.DetailsTabPaneManager
-import ipetoolkit.workspace.WorkspaceManagement.{AddWorkspaceEntry, LoadWorkspace, NewWorkspace, SaveWorkspace}
+import ipetoolkit.workspace.WorkspaceManagement.{AddWorkspaceEntry, NewWorkspace}
 
 class MainController extends Initializable {
 
@@ -52,11 +52,11 @@ class MainController extends Initializable {
   }
 
   def saveWorkspace() = {
-    IPEEventBus.publish(SaveWorkspace())
+//    IPEEventBus.publish(SaveWorkspace())
   }
 
   def loadWorkspace() = {
-    IPEEventBus.publish(LoadWorkspace(workspaceDir, BasicWorkspaceEntryDeserializer))
+//    IPEEventBus.publish(LoadWorkspace(workspaceDir, BasicWorkspaceEntryDeserializer))
   }
 
 }

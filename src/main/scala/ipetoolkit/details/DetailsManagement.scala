@@ -3,13 +3,13 @@ package ipetoolkit.details
 import javafx.scene.Node
 
 import ipetoolkit.util.Message
-import ipetoolkit.workspace.WorkspaceEntry
+import ipetoolkit.workspace.WorkspaceEntryView
 
 
 trait DetailsManagement extends Message
 
 object DetailsManagement {
 
-  case class ShowDetails(entry: WorkspaceEntry, content: Node) extends DetailsManagement
+  case class ShowDetails(entry: WorkspaceEntryView, content: Node) extends DetailsManagement
 
 }

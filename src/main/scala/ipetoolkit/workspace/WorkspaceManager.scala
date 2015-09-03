@@ -2,19 +2,17 @@ package ipetoolkit.workspace
 
 import java.io.File
 import javafx.event.EventHandler
-import javafx.scene.control.{TreeCell, TreeItem, TreeView}
+import javafx.scene.control.{TreeCell, TreeView}
 import javafx.scene.input.MouseEvent
 import javafx.util.Callback
 
 import akka.actor.{Actor, ActorLogging, Props}
 import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.JavaFXDispatcher
-import ipetoolkit.workspace.WorkspaceManagement._
+import ipetoolkit.workspace.WorkspaceManagement.NewWorkspace
 import ipetoolkit.workspace.WorkspaceManager.WorkspaceTreeCell
 
-import scala.collection.JavaConverters._
-
-class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBus) extends Actor with ActorLogging {
+class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit eventBus: ClassBasedEventBus) extends Actor with ActorLogging {
 
   private val workspaceFileName = "workspace.xml"
   private var workspaceDir: File = _
@@ -29,67 +27,33 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntry])(implicit even
     }
   })
 
-  //TODO rodzielic (add,remove)(new,load,save)
-  override def receive: Receive = {
-
-    case AddWorkspaceEntry(entry, parentUidOpt) =>
-      treeView.getRoot.getValue.addChild(entry, parentUidOpt)
-
-    case RemoveWorkspaceEntry(uid) =>
-      removeItem(uid, treeView.getRoot)
-
-    case ReplaceWorkspaceEntry(uid, entry) =>
-      replaceEntry(uid, entry.treeItem)
-
-
-    case NewWorkspace(dir, rootEntry) =>
-      workspaceDir = new File(dir)
-      treeView.setRoot(rootEntry.treeItem)
-    case SaveWorkspace() =>
-      workspaceDir.mkdirs()
-      scala.xml.XML.save(new File(workspaceDir, workspaceFileName).getAbsolutePath, treeView.getRoot.getValue.toXml.get)
-    case LoadWorkspace(dir, loader) =>
-      val xml = scala.xml.XML.loadFile(new File(dir, workspaceFileName))
-      loader.fromXml(xml) match {
-        case Some(rootEntry) =>
-          workspaceDir = new File(dir)
-          treeView.setRoot(rootEntry.treeItem)
-        case None => () //TODO
-      }
-
-  }
-
   private def enrichTreeViewCellFactory(): Unit = {
     //TODO nadpisujemy istniejaca fabrykę uzytkownika, wiec smutno, trzeba wymyslic lepsze rozwiazanie
     val originalCellFactory = treeView.getCellFactory
-    treeView.setCellFactory(new Callback[TreeView[WorkspaceEntry], TreeCell[WorkspaceEntry]] {
-      override def call(param: TreeView[WorkspaceEntry]): TreeCell[WorkspaceEntry] = new WorkspaceTreeCell
+    treeView.setCellFactory(new Callback[TreeView[WorkspaceEntryView], TreeCell[WorkspaceEntryView]] {
+      override def call(param: TreeView[WorkspaceEntryView]): TreeCell[WorkspaceEntryView] = new WorkspaceTreeCell
     })
   }
 
-  private def removeItem(uid: String, item: TreeItem[WorkspaceEntry]): Unit = {
-    val filteredItems = item.getChildren.asScala.filter(_.getValue.uid != uid)
-    item.getChildren.setAll(filteredItems.asJava)
-    filteredItems.foreach(removeItem(uid, _))
+  override def receive: Receive = {
+//    case AddWorkspaceEntry(entry, parentUidOpt) =>
+//      treeView.getRoot.getValue.addChild(entry, parentUidOpt)
+
+    case NewWorkspace(dir, rootEntry) =>
+      workspaceDir = new File(dir)
+      treeView.setRoot(rootEntry.view.treeItem)
   }
 
-  private def replaceEntry(uid: String, item: TreeItem[WorkspaceEntry]): Unit = {
-    val replacedItems = item.getChildren.asScala.map {
-      case elem if elem.getValue.uid == uid => item
-      case elem => elem
-    }
-    item.getChildren.setAll(replacedItems.asJava)
-    replacedItems.foreach(replaceEntry(uid, _))
-  }
+
 }
 
 object WorkspaceManager {
 
-  def props(treeView: TreeView[WorkspaceEntry])(implicit eventBus: ClassBasedEventBus): Props = Props(new WorkspaceManager(treeView)).withDispatcher(JavaFXDispatcher.Id)
+  def props(treeView: TreeView[WorkspaceEntryView])(implicit eventBus: ClassBasedEventBus): Props = Props(new WorkspaceManager(treeView)).withDispatcher(JavaFXDispatcher.Id)
 
-  private class WorkspaceTreeCell extends TreeCell[WorkspaceEntry] {
+  private class WorkspaceTreeCell extends TreeCell[WorkspaceEntryView] {
 
-    override def updateItem(item: WorkspaceEntry, empty: Boolean): Unit = {
+    override def updateItem(item: WorkspaceEntryView, empty: Boolean): Unit = {
       if (getItem != null)
         textProperty().unbindBidirectional(getItem.nameProperty)
       super.updateItem(item, empty)
