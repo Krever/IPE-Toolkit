@@ -1,16 +1,15 @@
 package ipetoolkit.sample
 
-import javafx.beans.property.StringProperty
-import javafx.event.{EventHandler, ActionEvent}
-import javafx.scene.control.{MenuItem, ContextMenu}
+import javafx.beans.property.SimpleStringProperty
+import javafx.event.{ActionEvent, EventHandler}
+import javafx.scene.control.{ContextMenu, MenuItem}
 import javafx.scene.layout.Pane
 
 import ipetoolkit.details.DetailsManagement.ShowDetails
 import ipetoolkit.util.Message
 import ipetoolkit.workspace.{WorkspaceEntry, WorkspaceEntryView}
 
-class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry, override val nameProperty :StringProperty) extends WorkspaceEntryView{
-
+class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry, override val nameProperty : SimpleStringProperty) extends WorkspaceEntryView{
 
   override def contextMenu: Option[ContextMenu] = {
     val item1 = new MenuItem("Add")

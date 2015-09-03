@@ -12,7 +12,7 @@ trait WorkspaceEntry {
 
   val uuid = UUID.randomUUID().toString
 
-  val view : WorkspaceEntryView = null
+  val view : WorkspaceEntryView
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
     children += workspaceEntry
