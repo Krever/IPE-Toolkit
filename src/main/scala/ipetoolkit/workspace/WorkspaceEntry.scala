@@ -6,7 +6,7 @@ import scala.collection.mutable
 
 trait WorkspaceEntry {
 
-  private var children = mutable.ArrayBuffer[WorkspaceEntry]()
+  private var children = mutable.HashSet[WorkspaceEntry]() // albo var albo mutable ?
 
   private var parent : WorkspaceEntry = null
 
