@@ -14,7 +14,7 @@ class MainController extends Initializable {
   lazy val system = Global.actorSystem
   implicit val eEventBus = IPEEventBus
 
-  val workspaceDir = "/tmp/ipetoolkit-test/" //TODO zaminic na popup albo sciezke do user.home
+  val workspaceDir = "/tmp/ipetoolkit-test/" //TODO zaminic na popup albo sciezke do user.home; propagowaæ do zmiennej globalnej
 
   @FXML
   var detailsTabPane: TabPane = _
