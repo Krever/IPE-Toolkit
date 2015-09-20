@@ -18,6 +18,7 @@ class Main extends Application {
     primaryStage.setOnCloseRequest(new EventHandler[WindowEvent] {
       override def handle(event: WindowEvent): Unit = {
         Global.actorSystem.shutdown()
+        System.exit(0)
       }
     })
 
