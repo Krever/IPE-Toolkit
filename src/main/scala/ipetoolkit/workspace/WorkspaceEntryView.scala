@@ -21,7 +21,7 @@ trait WorkspaceEntryView {
 
   def contextMenu: Option[ContextMenu]
 
-  def detailsPath: String
+  def detailsPath: String = ""
 
   def addWorkSpaceEntry(workspaceEntry: WorkspaceEntry) = {
     model.addChild(workspaceEntry)
@@ -42,9 +42,10 @@ trait WorkspaceEntryView {
   def detailsOpener: Option[Message] = {
     if(!Strings.isNullOrEmpty(detailsPath)) {
       val loader = new FXMLLoader(getClass.getResource(detailsPath))
+      val pane = loader.load[Node]()
       val controller = loader.getController[DetailsController]
       controller.setModel(this.model)
-      Some(ShowDetails(this, loader.load[Node]()))
+      Some(ShowDetails(this, pane))
     }else{
      None
     }

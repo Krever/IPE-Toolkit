@@ -7,9 +7,10 @@ import javafx.scene.control.TabPane
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.details.DetailsTabPaneManager
+import ipetoolkit.workspace.{WorkspaceEntry, DetailsController}
 import ipetoolkit.workspace.WorkspaceManagement.{LoadWorkspace, NewWorkspace, SaveWorkspace}
 
-class MainController extends Initializable {
+class MainController extends Initializable with DetailsController {
 
   lazy val system = Global.actorSystem
   implicit val eEventBus = IPEEventBus
@@ -37,4 +38,7 @@ class MainController extends Initializable {
     IPEEventBus.publish(LoadWorkspace(workspaceDir))
   }
 
+  override def setModel(workspaceEntry: WorkspaceEntry): Unit = {
+
+  }
 }

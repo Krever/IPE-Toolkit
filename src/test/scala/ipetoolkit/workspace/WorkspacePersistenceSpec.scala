@@ -8,7 +8,6 @@ import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import akka.util.Timeout
-import ipetoolkit.util.Message
 import ipetoolkit.workspace.WorkspacePersistence.{Load, Loaded, Persist}
 import org.scalatest.{Matchers, WordSpecLike}
 
@@ -24,7 +23,7 @@ class TestWorkspaceEntryView(val model: WorkspaceEntry) extends WorkspaceEntryVi
 
   override def contextMenu: Option[ContextMenu] = None
 
-  override def detailsOpener: Option[Message] = None
+  override def detailsPath: String = ???
 }
 
 @XmlRootElement

@@ -3,10 +3,7 @@ package ipetoolkit.sample
 import javafx.beans.property.SimpleStringProperty
 import javafx.event.{ActionEvent, EventHandler}
 import javafx.scene.control.{ContextMenu, MenuItem}
-import javafx.scene.layout.Pane
 
-import ipetoolkit.details.DetailsManagement.ShowDetails
-import ipetoolkit.util.Message
 import ipetoolkit.workspace.{WorkspaceEntry, WorkspaceEntryView}
 
 class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry, override val nameProperty : SimpleStringProperty) extends WorkspaceEntryView{
@@ -23,9 +20,7 @@ class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry, override val name
     Some(new ContextMenu(item1, item2))
   }
 
-  override def detailsOpener: Option[Message] = Some(ShowDetails(this, new Pane()))
-
   override def model: WorkspaceEntry = workspaceEntry
 
-  override def detailsPath: String = ???
+  override def detailsPath: String = "/testTabView.fxml"
 }
