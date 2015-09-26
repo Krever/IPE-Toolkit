@@ -21,7 +21,10 @@ trait WorkspaceEntryView {
 
   def addWorkSpaceEntry(workspaceEntry: WorkspaceEntry) = {
     model.addChild(workspaceEntry)
-    treeItem.getChildren.add(workspaceEntry.view.treeItem)
+  }
+
+  def addChildToView(entryView: WorkspaceEntryView): Unit = {
+    treeItem.getChildren.add(entryView.treeItem)
   }
 
   def removeWorkSpaceEntry() = {

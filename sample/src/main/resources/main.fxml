@@ -37,7 +37,6 @@
                     <Menu mnemonicParsing="false" text="Empty"/>
                 </menus>
             </MenuBar>
-            <Button mnemonicParsing="false" onAction="#addWorkspaceEntry" text="Entry 1"/>
 
         </ToolBar>
     </top>
