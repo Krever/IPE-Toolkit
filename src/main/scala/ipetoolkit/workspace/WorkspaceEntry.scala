@@ -10,7 +10,8 @@ trait WorkspaceEntry {
 
   private var parent : WorkspaceEntry = null
 
-  val uuid = UUID.randomUUID().toString
+  private val id = UUID.randomUUID().toString
+  def uuid = id
 
   val view : WorkspaceEntryView
 
