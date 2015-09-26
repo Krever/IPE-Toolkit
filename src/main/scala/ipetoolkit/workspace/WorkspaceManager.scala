@@ -9,12 +9,15 @@ import javafx.util.Callback
 import akka.actor.{Actor, ActorLogging, Props}
 import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.JavaFXDispatcher
-import ipetoolkit.workspace.WorkspaceManagement.NewWorkspace
+import ipetoolkit.workspace.WorkspaceManagement.{LoadWorkspace, NewWorkspace, SaveWorkspace}
 import ipetoolkit.workspace.WorkspaceManager.WorkspaceTreeCell
+import ipetoolkit.workspace.WorkspacePersistence.{Load, Loaded, Persist}
+
+import scala.util.{Failure, Success}
 
 class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit eventBus: ClassBasedEventBus) extends Actor with ActorLogging {
 
-  private var workspaceDir: File = _
+  private val persistence = context.actorOf(Props[WorkspacePersistence])
 
   eventBus.subscribe(self, classOf[WorkspaceManagement])
   enrichTreeViewCellFactory()
@@ -35,8 +38,12 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit 
 
   override def receive: Receive = {
     case NewWorkspace(dir, rootEntry) =>
-      workspaceDir = new File(dir)
       treeView.setRoot(rootEntry.view.treeItem)
+      persistence ! Persist(rootEntry, new File(dir))
+    case SaveWorkspace(dir) => persistence ! Persist(treeView.getRoot.getValue.model, new File(dir))
+    case LoadWorkspace(dir) => persistence ! Load(new File(dir))
+    case Loaded(Success(rootEntry)) => treeView.setRoot(rootEntry.view.treeItem)
+    case Loaded(Failure(e)) => e.printStackTrace()
   }
 
 }

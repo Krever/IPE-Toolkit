@@ -1,26 +1,36 @@
 package ipetoolkit.workspace
 
+import java.util
 import java.util.UUID
+import javax.xml.bind.annotation._
 
-import scala.collection.mutable
+import scala.collection.JavaConverters._
 
+@XmlAccessorType(XmlAccessType.NONE)
 trait WorkspaceEntry {
 
-  private var children = mutable.HashSet[WorkspaceEntry]() // albo var albo mutable ?
+
+  protected var _children: List[WorkspaceEntry] = List()
+
+  def children: List[WorkspaceEntry] = _children
 
   private var parent : WorkspaceEntry = null
 
-  val uuid = UUID.randomUUID().toString
+  @XmlElement
+  protected val _uuid = UUID.randomUUID().toString
+
+  def uuid: String = _uuid
 
   val view : WorkspaceEntryView
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
-    children += workspaceEntry
+    _children = _children :+ workspaceEntry
     workspaceEntry.parent = this
+    view.addChildToView(workspaceEntry.view)
   }
 
   def removeChild(workspaceEntry: WorkspaceEntry) = {
-    children -= workspaceEntry
+    _children = _children.filter(!_.equals(workspaceEntry))
   }
 
   private[workspace] def dispose() = {
@@ -30,4 +40,18 @@ trait WorkspaceEntry {
     }
   }
 
+
+  @XmlElementWrapper
+  @XmlAnyElement(lax = true)
+  protected def getChildren(): util.Collection[WorkspaceEntry] = new util.LinkedList[WorkspaceEntry](children.asJavaCollection) {
+    //JAXB doesnt use setter for collection types so we need to hack it.
+    override def add(e: WorkspaceEntry): Boolean = {
+      addChild(e)
+      true
+    }
+
+  }
+
+
 }
+

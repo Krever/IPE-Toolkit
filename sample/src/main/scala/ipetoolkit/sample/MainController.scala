@@ -7,14 +7,14 @@ import javafx.scene.control.TabPane
 
 import ipetoolkit.bus.IPEEventBus
 import ipetoolkit.details.DetailsTabPaneManager
-import ipetoolkit.workspace.WorkspaceManagement.NewWorkspace
+import ipetoolkit.workspace.WorkspaceManagement.{LoadWorkspace, NewWorkspace, SaveWorkspace}
 
 class MainController extends Initializable {
 
   lazy val system = Global.actorSystem
   implicit val eEventBus = IPEEventBus
 
-  val workspaceDir = "/tmp/ipetoolkit-test/" //TODO zaminic na popup albo sciezke do user.home
+  val workspaceDir = "/tmp/ipetoolkit-test/" //TODO zaminic na popup albo sciezke do user.home; propagowac do zmiennej globalnej
 
   @FXML
   var detailsTabPane: TabPane = _
@@ -24,20 +24,17 @@ class MainController extends Initializable {
     system.actorOf(DetailsTabPaneManager.props(detailsTabPane))
   }
 
-  def addWorkspaceEntry() = {
-//    IPEEventBus.publish(AddWorkspaceEntry(BasicWorkspaceEntry(), None))
-  }
 
   def newWorkspace() = {
-    IPEEventBus.publish(NewWorkspace(workspaceDir, BasicWorkspaceEntry("Root")))
+    IPEEventBus.publish(NewWorkspace(workspaceDir, new BasicWorkspaceEntry("Root")))
   }
 
   def saveWorkspace() = {
-//    IPEEventBus.publish(SaveWorkspace())
+    IPEEventBus.publish(SaveWorkspace(workspaceDir))
   }
 
   def loadWorkspace() = {
-//    IPEEventBus.publish(LoadWorkspace(workspaceDir, BasicWorkspaceEntryDeserializer))
+    IPEEventBus.publish(LoadWorkspace(workspaceDir))
   }
 
 }
