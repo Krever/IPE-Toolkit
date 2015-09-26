@@ -21,4 +21,3 @@ lazy val root = project.in(file("."))
 
 lazy val sample = project.in(file("sample"))
   .dependsOn(root)
-

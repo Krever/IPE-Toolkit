@@ -8,11 +8,12 @@ import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.Message
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
+import org.scalatest.{BeforeAndAfterAll, Ignore, Matchers, WordSpecLike}
 
 import scala.language.postfixOps
 
 
+@Ignore
 class TaskManagerSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
 with WordSpecLike with Matchers with BeforeAndAfterAll with MockitoSugar {
 
