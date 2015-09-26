@@ -4,11 +4,12 @@ import java.util
 import java.util.UUID
 import javax.xml.bind.annotation._
 
+import com.typesafe.scalalogging.LazyLogging
+
 import scala.collection.JavaConverters._
 
 @XmlAccessorType(XmlAccessType.NONE)
-trait WorkspaceEntry {
-
+trait WorkspaceEntry extends LazyLogging{
 
   protected var _children: List[WorkspaceEntry] = List()
 
@@ -24,9 +25,13 @@ trait WorkspaceEntry {
   val view : WorkspaceEntryView
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
-    _children = _children :+ workspaceEntry
-    workspaceEntry.parent = this
-    view.addChildToView(workspaceEntry.view)
+    if( !children.exists(entry => entry.equals(workspaceEntry)) ) {
+      _children = _children :+ workspaceEntry
+      workspaceEntry.parent = this
+      view.addChildToView(workspaceEntry.view)
+    }else{
+      logger.debug("Adding duplicate workspaceEntryView", s"Trying to load ${workspaceEntry.uuid}")
+    }
   }
 
   def removeChild(workspaceEntry: WorkspaceEntry) = {
@@ -43,7 +48,7 @@ trait WorkspaceEntry {
 
   @XmlElementWrapper
   @XmlAnyElement(lax = true)
-  protected def getChildren(): util.Collection[WorkspaceEntry] = new util.LinkedList[WorkspaceEntry](children.asJavaCollection) {
+  protected def getChildren: util.Collection[WorkspaceEntry] = new util.LinkedList[WorkspaceEntry](children.asJavaCollection) {
     //JAXB doesnt use setter for collection types so we need to hack it.
     override def add(e: WorkspaceEntry): Boolean = {
       addChild(e)
@@ -52,6 +57,12 @@ trait WorkspaceEntry {
 
   }
 
+  override def equals(other: Any) = {
+    other match {
+      case entry: WorkspaceEntry if this.uuid.equals(entry.uuid) => true
+      case _ => false
+    }
 
+  }
 }
 
