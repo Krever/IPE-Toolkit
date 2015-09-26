@@ -26,4 +26,6 @@ class BasicWorkspaceEntryView(workspaceEntry : WorkspaceEntry, override val name
   override def detailsOpener: Option[Message] = Some(ShowDetails(this, new Pane()))
 
   override def model: WorkspaceEntry = workspaceEntry
+
+  override def detailsPath: String = ???
 }

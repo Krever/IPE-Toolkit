@@ -15,6 +15,7 @@ libraryDependencies in ThisBuild ++= Seq(
   , "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   , "org.mockito" % "mockito-core" % "2.0.3-beta" % "test"
   , "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test"
+  , "com.google.guava" % "guava" % "12.0"
 )
 
 lazy val root = project.in(file("."))

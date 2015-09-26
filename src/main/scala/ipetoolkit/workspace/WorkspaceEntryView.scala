@@ -1,8 +1,12 @@
 package ipetoolkit.workspace
 
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
+import javafx.fxml.FXMLLoader
+import javafx.scene.Node
 import javafx.scene.control.{ContextMenu, TreeItem}
 
+import com.google.common.base.Strings
+import ipetoolkit.details.DetailsManagement.ShowDetails
 import ipetoolkit.util.Message
 
 trait WorkspaceEntryView {
@@ -17,7 +21,7 @@ trait WorkspaceEntryView {
 
   def contextMenu: Option[ContextMenu]
 
-  def detailsOpener: Option[Message]
+  def detailsPath: String
 
   def addWorkSpaceEntry(workspaceEntry: WorkspaceEntry) = {
     model.addChild(workspaceEntry)
@@ -32,5 +36,15 @@ trait WorkspaceEntryView {
     treeItem.getChildren.remove(workspaceEntryView.treeItem)
   }
 
+  def detailsOpener: Option[Message] = {
+    if(!Strings.isNullOrEmpty(detailsPath)) {
+      val loader = new FXMLLoader(getClass.getResource(detailsPath))
+      val controller = loader.getController[DetailsController]
+      controller.setModel(this.model)
+      Some(ShowDetails(this, loader.load[Node]()))
+    }else{
+     None
+    }
+  }
 
 }
