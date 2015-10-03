@@ -29,6 +29,7 @@ trait WorkspaceEntryView {
 
   def addChildToView(entryView: WorkspaceEntryView): Unit = {
     treeItem.getChildren.add(entryView.treeItem)
+    treeItem.setExpanded(true)
   }
 
   def removeWorkSpaceEntry() = {
