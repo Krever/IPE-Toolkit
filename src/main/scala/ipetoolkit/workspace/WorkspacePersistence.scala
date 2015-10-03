@@ -11,7 +11,7 @@ import akka.actor.Actor
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-private[workspace] object WorkspacePersistence {
+object WorkspacePersistence {
 
   case class Persist(rootEntry: WorkspaceEntry, file: File)
 
