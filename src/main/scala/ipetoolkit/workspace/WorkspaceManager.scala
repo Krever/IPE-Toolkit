@@ -9,7 +9,7 @@ import javafx.util.Callback
 import akka.actor.{Actor, ActorLogging, Props}
 import ipetoolkit.bus.ClassBasedEventBus
 import ipetoolkit.util.JavaFXDispatcher
-import ipetoolkit.workspace.WorkspaceManagement.{LoadWorkspace, NewWorkspace, SaveWorkspace}
+import ipetoolkit.workspace.WorkspaceManagement.{LoadOrNewWorkspace, LoadWorkspace, NewWorkspace, SaveWorkspace}
 import ipetoolkit.workspace.WorkspaceManager.WorkspaceTreeCell
 import ipetoolkit.workspace.WorkspacePersistence.{Load, Loaded, Persist}
 
@@ -37,12 +37,21 @@ class WorkspaceManager private(treeView: TreeView[WorkspaceEntryView])(implicit 
   }
 
   override def receive: Receive = {
+    case LoadOrNewWorkspace(dir, rootEntry) =>
+      if (new File(dir).exists())
+        self ! LoadWorkspace(dir)
+      else
+        self ! NewWorkspace(dir, rootEntry)
     case NewWorkspace(dir, rootEntry) =>
       treeView.setRoot(rootEntry.view.treeItem)
       persistence ! Persist(rootEntry, new File(dir))
+
     case SaveWorkspace(dir) => persistence ! Persist(treeView.getRoot.getValue.model, new File(dir))
+
     case LoadWorkspace(dir) => persistence ! Load(new File(dir))
+
     case Loaded(Success(rootEntry)) => treeView.setRoot(rootEntry.view.treeItem)
+
     case Loaded(Failure(e)) => e.printStackTrace()
   }
 

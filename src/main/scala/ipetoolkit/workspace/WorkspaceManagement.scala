@@ -13,6 +13,8 @@ object WorkspaceManagement {
 
   case class LoadWorkspace(dir: String) extends WorkspaceManagement
 
+  case class LoadOrNewWorkspace(dir: String, rootEntry: WorkspaceEntry) extends WorkspaceManagement
+
 
 }
 
