@@ -48,7 +48,7 @@ private[workspace] object WorkspacePersistence {
 
 }
 
-private[workspace] class WorkspacePersistence extends Actor {
+class WorkspacePersistence extends Actor {
 
   import WorkspacePersistence._
 
