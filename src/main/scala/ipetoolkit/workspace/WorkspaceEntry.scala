@@ -2,6 +2,7 @@ package ipetoolkit.workspace
 
 import java.util
 import java.util.UUID
+import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javax.xml.bind.annotation._
 
 import com.typesafe.scalalogging.LazyLogging
@@ -22,6 +23,8 @@ trait WorkspaceEntry extends LazyLogging{
 
   def uuid: String = _uuid
 
+  var nameProperty: StringProperty = new SimpleStringProperty(uuid.toString)
+
   val view : WorkspaceEntryView
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
@@ -29,6 +32,7 @@ trait WorkspaceEntry extends LazyLogging{
       _children = _children :+ workspaceEntry
       workspaceEntry.parent = this
       view.addChildToView(workspaceEntry.view)
+      workspaceEntry.nameProperty.bindBidirectional(workspaceEntry.view.nameProperty)
     }else{
       logger.debug("Adding duplicate workspaceEntryView", s"Trying to load ${workspaceEntry.uuid}")
     }
@@ -38,13 +42,12 @@ trait WorkspaceEntry extends LazyLogging{
     _children = _children.filter(!_.equals(workspaceEntry))
   }
 
-  private[workspace] def dispose() = {
+  def delete() = {
     if(parent != null){
       parent.view.removeWorkSpaceViewFromParent(this.view)
       parent.removeChild(this)
     }
   }
-
 
   @XmlElementWrapper
   @XmlAnyElement(lax = true)

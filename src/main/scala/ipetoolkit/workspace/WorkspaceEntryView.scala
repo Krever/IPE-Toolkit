@@ -32,7 +32,7 @@ trait WorkspaceEntryView {
   }
 
   def removeWorkSpaceEntry() = {
-    model.dispose()
+    model.delete()
   }
 
   private[workspace] def removeWorkSpaceViewFromParent(workspaceEntryView: WorkspaceEntryView) = {
