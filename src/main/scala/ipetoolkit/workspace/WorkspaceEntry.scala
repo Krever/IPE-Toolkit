@@ -28,7 +28,7 @@ trait WorkspaceEntry extends LazyLogging{
   val view : WorkspaceEntryView
 
   def addChild(workspaceEntry: WorkspaceEntry): Unit ={
-    if( !children.exists(entry => entry.equals(workspaceEntry)) ) {
+    if( !_children.exists(entry => entry.equals(workspaceEntry)) ) {
       _children = _children :+ workspaceEntry
       workspaceEntry.parent = this
       view.addChildToView(workspaceEntry.view)
@@ -65,7 +65,11 @@ trait WorkspaceEntry extends LazyLogging{
       case entry: WorkspaceEntry if this.uuid.equals(entry.uuid) => true
       case _ => false
     }
-
   }
+
+  @XmlElement
+  def getName :String = view.nameProperty.getValue
+
+  def setName(name :String ) = view.nameProperty.setValue(name)
 }
 
