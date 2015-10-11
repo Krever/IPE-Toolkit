@@ -23,7 +23,7 @@ trait WorkspaceEntry extends LazyLogging{
 
   def uuid: String = _uuid
 
-  var nameProperty: StringProperty = new SimpleStringProperty(uuid.toString)
+  var nameProperty: StringProperty = new SimpleStringProperty()
 
   val view : WorkspaceEntryView
 

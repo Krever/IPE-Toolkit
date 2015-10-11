@@ -1,6 +1,7 @@
 package ipetoolkit.workspace
 
 import java.io.File
+import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.scene.control.ContextMenu
 import javax.xml.bind.annotation.XmlRootElement
 
@@ -24,6 +25,8 @@ class TestWorkspaceEntryView(val model: WorkspaceEntry) extends WorkspaceEntryVi
   override def contextMenu: Option[ContextMenu] = None
 
   override def detailsPath: String = ???
+
+  override def nameProperty: StringProperty = new SimpleStringProperty("TestEntry")
 }
 
 @XmlRootElement

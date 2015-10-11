@@ -11,7 +11,7 @@ import ipetoolkit.util.Message
 
 trait WorkspaceEntryView {
 
-  val nameProperty: StringProperty = new SimpleStringProperty(uid.toString)
+  def nameProperty: StringProperty
 
   val treeItem = new TreeItem[WorkspaceEntryView](this)
 
