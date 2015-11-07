@@ -63,6 +63,7 @@ class WorkspacePersistence extends Actor {
       val jaxbMarshaller = jaxbContext.createMarshaller()
       jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
 
+      file.getParentFile.mkdirs()
       jaxbMarshaller.marshal(workspaceWrapper, file)
 
     case Load(file) => sender() ! Loaded(Try {
