@@ -6,8 +6,8 @@ import javafx.fxml.{FXML, Initializable}
 import javafx.scene.control.TabPane
 
 import ipetoolkit.bus.IPEEventBus
-import ipetoolkit.details.DetailsTabPaneManager
-import ipetoolkit.workspace.{WorkspaceEntry, DetailsController}
+import ipetoolkit.details.{DetailsController, DetailsTabPaneManager}
+import ipetoolkit.workspace.WorkspaceEntry
 import ipetoolkit.workspace.WorkspaceManagement.{LoadWorkspace, NewWorkspace, SaveWorkspace}
 
 class MainController extends Initializable with DetailsController {
@@ -27,7 +27,7 @@ class MainController extends Initializable with DetailsController {
 
 
   def newWorkspace() = {
-    IPEEventBus.publish(NewWorkspace(workspaceDir, new BasicWorkspaceEntry("Root")))
+    IPEEventBus.publish(NewWorkspace(workspaceDir, new BasicWorkspaceEntryView(new BasicWorkspaceEntry("Root"))))
   }
 
   def saveWorkspace() = {
@@ -35,7 +35,7 @@ class MainController extends Initializable with DetailsController {
   }
 
   def loadWorkspace() = {
-    IPEEventBus.publish(LoadWorkspace(workspaceDir))
+    IPEEventBus.publish(LoadWorkspace(workspaceDir, (model: WorkspaceEntry) => new BasicWorkspaceEntryView(model)))
   }
 
   override def setModel(workspaceEntry: WorkspaceEntry): Unit = {

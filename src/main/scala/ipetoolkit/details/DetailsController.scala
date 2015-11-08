@@ -1,4 +1,6 @@
-package ipetoolkit.workspace
+package ipetoolkit.details
+
+import ipetoolkit.workspace.WorkspaceEntry
 
 /**
  * Created by humblehound on 26.09.15.

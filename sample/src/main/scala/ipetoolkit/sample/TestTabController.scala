@@ -1,6 +1,7 @@
 package ipetoolkit.sample
 
-import ipetoolkit.workspace.{WorkspaceEntry, DetailsController}
+import ipetoolkit.details.DetailsController
+import ipetoolkit.workspace.WorkspaceEntry
 
 /**
  * Created by humblehound on 26.09.15.

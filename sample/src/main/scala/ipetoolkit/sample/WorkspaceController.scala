@@ -7,6 +7,7 @@ import javafx.scene.control._
 
 import akka.actor.ActorRef
 import ipetoolkit.bus.{ClassBasedEventBus, IPEEventBus}
+import ipetoolkit.details.DetailsController
 import ipetoolkit.workspace._
 
 
@@ -18,8 +19,6 @@ class WorkspaceController extends Initializable with DetailsController {
   implicit val actorSystem = Global.actorSystem
 
   var workspaceManager: ActorRef = _
-
-  var model: WorkspaceEntry = _
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
     implicit val eventBus: ClassBasedEventBus = IPEEventBus

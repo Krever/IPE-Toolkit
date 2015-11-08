@@ -1,55 +1,65 @@
 package ipetoolkit.workspace
 
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.fxml.FXMLLoader
 import javafx.scene.Node
 import javafx.scene.control.{ContextMenu, TreeItem}
 
-import com.google.common.base.Strings
+import ipetoolkit.details.DetailsController
 import ipetoolkit.details.DetailsManagement.ShowDetails
 import ipetoolkit.util.Message
 
+import scala.collection.JavaConverters._
+
 trait WorkspaceEntryView {
 
-  def nameProperty: StringProperty
+  //MUST BE OVERRIDEN IN CONSTRUCTOR
+  def model: WorkspaceEntry
+
+  setUpModelSync()
+
+  def childrenToViews: PartialFunction[WorkspaceEntry, WorkspaceEntryView]
+
+
+  lazy val nameProperty: StringProperty = new SimpleStringProperty(model.getName)
 
   val treeItem = new TreeItem[WorkspaceEntryView](this)
-
-  def model: WorkspaceEntry
+  updateTreeItemChildren(model.children)
 
   def uid: String = model.uuid
 
-  def contextMenu: Option[ContextMenu]
+  def contextMenu: Option[ContextMenu] = None
 
-  def detailsPath: String = ""
+  def detailsPath: Option[String] = None
 
-  def addWorkSpaceEntry(workspaceEntry: WorkspaceEntry) = {
-    model.addChild(workspaceEntry)
-  }
+  def addChild(workspaceEntry: WorkspaceEntry) = model.addChild(workspaceEntry)
 
-  def addChildToView(entryView: WorkspaceEntryView): Unit = {
-    treeItem.getChildren.add(entryView.treeItem)
-    treeItem.setExpanded(true)
-  }
-
-  def removeWorkSpaceEntry() = {
-    model.delete()
-  }
-
-  private[workspace] def removeWorkSpaceViewFromParent(workspaceEntryView: WorkspaceEntryView) = {
-    treeItem.getChildren.remove(workspaceEntryView.treeItem)
-  }
+  def remove() = model.remove()
 
   def detailsOpener: Option[Message] = {
-    if(!Strings.isNullOrEmpty(detailsPath)) {
-      val loader = new FXMLLoader(getClass.getResource(detailsPath))
+    detailsPath.map { path =>
+      val loader = new FXMLLoader(getClass.getResource(path))
       val pane = loader.load[Node]()
       val controller = loader.getController[DetailsController]
       controller.setModel(this.model)
-      Some(ShowDetails(this, pane))
-    }else{
-     None
+      ShowDetails(this, pane)
     }
   }
 
+  private def setUpModelSync(): Unit = {
+    model.addListener(new WorkspaceEntryListener {
+      override def nameChanged(newName: String): Unit = nameProperty.setValue(newName)
+
+      override def childrenChanged(newChildren: Iterable[WorkspaceEntry]): Unit = updateTreeItemChildren(newChildren)
+    })
+
+    nameProperty.addListener(new ChangeListener[String] {
+      override def changed(observable: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit =
+        model.setName(newValue)
+    })
+  }
+
+  private def updateTreeItemChildren(newChildren: Iterable[WorkspaceEntry]) =
+    treeItem.getChildren.setAll(newChildren.map(childrenToViews).map(_.treeItem).asJavaCollection)
 }

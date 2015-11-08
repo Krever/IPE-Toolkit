@@ -1,8 +1,6 @@
 package ipetoolkit.workspace
 
 import java.io.File
-import javafx.beans.property.{SimpleStringProperty, StringProperty}
-import javafx.scene.control.ContextMenu
 import javax.xml.bind.annotation.XmlRootElement
 
 import akka.actor.{ActorSystem, Props}
@@ -21,22 +19,20 @@ import scala.util.Success
  */
 
 class TestWorkspaceEntryView(val model: WorkspaceEntry) extends WorkspaceEntryView {
-
-  override def contextMenu: Option[ContextMenu] = None
-
-  override def detailsPath: String = ???
-
-  override def nameProperty: StringProperty = new SimpleStringProperty("TestEntry")
+  override def childrenToViews: PartialFunction[WorkspaceEntry, WorkspaceEntryView] = {
+    case x: TestWorkspaceEntry => new TestWorkspaceEntryView(x)
+    case x: Test2WorkspaceEntry => new TestWorkspaceEntryView(x)
+  }
 }
 
 @XmlRootElement
 class TestWorkspaceEntry extends WorkspaceEntry {
-  override val view: WorkspaceEntryView = new TestWorkspaceEntryView(this)
+  setName("TestWorkspaceEntry")
 }
 
 @XmlRootElement
 class Test2WorkspaceEntry extends WorkspaceEntry {
-  override val view: WorkspaceEntryView = new TestWorkspaceEntryView(this)
+  setName("Test2WorkspaceEntry")
 }
 
 
